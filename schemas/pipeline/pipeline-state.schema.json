@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "schemaVersion": { "type": "string", "const": "1.0.0" },
+    "jobId": { "type": "string" },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "running",
+        "awaiting_approval",
+        "cancel_requested",
+        "retrying",
+        "completed",
+        "needs_review",
+        "failed",
+        "cancelled"
+      ]
+    },
+    "durationRepairAttemptsUsed": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "history": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "from": { "type": ["string", "null"] },
+          "to": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "running",
+              "awaiting_approval",
+              "cancel_requested",
+              "retrying",
+              "completed",
+              "needs_review",
+              "failed",
+              "cancelled"
+            ]
+          },
+          "stage": { "type": "string" },
+          "inputHash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "outputHash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "artifactPaths": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": { "type": "string" },
+              "message": { "type": "string" },
+              "details": { "type": "object" }
+            },
+            "required": ["code", "message"],
+            "additionalProperties": true
+          },
+          "note": { "type": "string" },
+          "attempt": { "type": "integer", "const": 1 },
+          "at": { "type": "string" }
+        },
+        "required": ["from", "to", "stage", "inputHash", "at"],
+        "additionalProperties": false,
+        "dependentRequired": {
+          "outputHash": ["artifactPaths"],
+          "artifactPaths": ["outputHash"]
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": { "attempt": { "const": 1 } }
+            },
+            "then": {
+              "properties": {
+                "stage": { "const": "DURATION_REPAIR_REQUIRED" }
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "required": ["schemaVersion", "jobId", "status", "durationRepairAttemptsUsed", "history"],
+  "additionalProperties": false
+}

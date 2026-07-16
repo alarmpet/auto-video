@@ -1,0 +1,83 @@
+{
+  "version": 1,
+  "selectedTopics": [
+    {
+      "title": "카인이 동생을 미워한 마음의 뿌리 | 질투와 비교의 심리",
+      "normalizedTitle": "카인이동생을미워한마음의뿌리|질투와비교의심리",
+      "psychTheme": "질투와 비교의 심리",
+      "topicKey": "질투와비교의심리",
+      "biblicalAnchor": "카인",
+      "slug": "gguljam-bible-cain-envy-20min-sample-newflow-008",
+      "targetMinutes": 20,
+      "stage": "rendered",
+      "selectedAt": "2026-07-01T00:00:00.000Z",
+      "firstSelectedAt": "2026-07-01T00:00:00.000Z",
+      "notes": "Selected theme is blocked from repeat recommendation; Cain can still be reused for a different modern psychology angle."
+    },
+    {
+      "title": "야곱은 왜 사랑받고도 불안했을까 | 인정 욕구와 불안의 심리",
+      "normalizedTitle": "야곱은왜사랑받고도불안했을까|인정욕구와불안의심리",
+      "psychTheme": "인정 욕구와 불안의 심리",
+      "topicKey": "인정욕구와불안의심리",
+      "biblicalAnchor": "야곱",
+      "slug": "gguljam-bible-jacob-loved-anxious-20min-001",
+      "targetMinutes": 20,
+      "stage": "rendered",
+      "selectedAt": "2026-07-02T00:00:00.000Z",
+      "firstSelectedAt": "2026-07-02T00:00:00.000Z",
+      "notes": "Selected theme is blocked from repeat recommendation; Jacob can still be reused for a different modern psychology angle."
+    },
+    {
+      "title": "엘리야는 왜 승리한 뒤에 무너졌을까 | 번아웃과 외로움의 심리",
+      "normalizedTitle": "엘리야는왜승리한뒤에무너졌을까|번아웃과외로움의심리",
+      "psychTheme": "번아웃과 외로움의 심리",
+      "topicKey": "번아웃과외로움의심리",
+      "biblicalAnchor": "엘리야",
+      "slug": "gguljam-bible-elijah-burnout-loneliness-20min-001",
+      "targetMinutes": 20,
+      "stage": "chapter_storyboard",
+      "selectedAt": "2026-07-02T00:00:00.000Z",
+      "firstSelectedAt": "2026-07-02T00:00:00.000Z",
+      "notes": "Selected theme is blocked from repeat recommendation; Elijah can still be reused for a different modern psychology angle."
+    },
+    {
+      "title": "요셉은 어떻게 억울함 속에서도 무너지지 않았을까 | 배신과 기다림의 심리",
+      "normalizedTitle": "요셉은어떻게억울함속에서도무너지지않았을까|배신과기다림의심리",
+      "psychTheme": "배신과 기다림의 심리",
+      "topicKey": "배신과기다림의심리",
+      "biblicalAnchor": "요셉",
+      "slug": "gguljam-bible-joseph-betrayal-waiting-20min-001",
+      "targetMinutes": 20,
+      "stage": "chapter_storyboard",
+      "selectedAt": "2026-07-02T12:16:25.559Z",
+      "firstSelectedAt": "2026-07-02T12:16:25.559Z",
+      "notes": "Selected theme is blocked from repeat recommendation; Joseph can still be reused for a different modern psychology angle."
+    },
+    {
+      "title": "자면서 듣는 성경 이야기. 내 마음은 왜 작은 말에도 무너질까 | 상처받기 쉬운 마음의 심리",
+      "normalizedTitle": "자면서듣는성경이야기.내마음은왜작은말에도무너질까|상처받기쉬운마음의심리",
+      "psychTheme": "상처받기 쉬운 마음의 심리",
+      "topicKey": "상처받기쉬운마음의심리",
+      "biblicalAnchor": "한나",
+      "slug": "gguljam-bible-sensitive-heart-small-words-10min-001",
+      "targetMinutes": 10,
+      "stage": "chapter_storyboard",
+      "selectedAt": "2026-07-03T03:48:19.195Z",
+      "notes": "10-minute chapters and sentence-grounded storyboard generated.",
+      "firstSelectedAt": "2026-07-02T19:19:23.911Z"
+    },
+    {
+      "title": "자면서 듣는 성경 이야기. 내 마음은 왜 늘 비교당한다고 느낄까 | 열등감과 자기방어의 심리",
+      "normalizedTitle": "자면서듣는성경이야기.내마음은왜늘비교당한다고느낄까|열등감과자기방어의심리",
+      "psychTheme": "열등감과 자기방어의 심리",
+      "topicKey": "열등감과자기방어의심리",
+      "biblicalAnchor": "사울과 다윗",
+      "slug": "gguljam-bible-inferiority-defense-saul-david-10min-001",
+      "targetMinutes": 10,
+      "stage": "chapter_storyboard",
+      "selectedAt": "2026-07-03T09:46:50.459Z",
+      "notes": "",
+      "firstSelectedAt": "2026-07-03T09:46:50.459Z"
+    }
+  ]
+}

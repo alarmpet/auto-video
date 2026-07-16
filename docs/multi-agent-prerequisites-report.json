@@ -1,0 +1,113 @@
+{
+  "ok": true,
+  "failures": [],
+  "warnings": [
+    "missing_optional:C:\\Users\\petbl\\hermes-studio\\timeline.md",
+    "visual_memory_db_present: do not let subagents open it directly; use orchestrator/Hermes reports to avoid DuckDB lock conflicts"
+  ],
+  "required": [
+    {
+      "path": "C:\\Users\\petbl\\auto-video\\auto-video.md",
+      "exists": true,
+      "bytes": 40399,
+      "mtime": "2026-07-01T13:04:04.535Z"
+    },
+    {
+      "path": "C:\\Users\\petbl\\auto-video\\scripts\\check_script_quality_suite.mjs",
+      "exists": true,
+      "bytes": 2966,
+      "mtime": "2026-07-01T12:33:01.424Z"
+    },
+    {
+      "path": "C:\\Users\\petbl\\auto-video\\scripts\\generate_script_revision_brief.mjs",
+      "exists": true,
+      "bytes": 3133,
+      "mtime": "2026-07-01T12:33:15.571Z"
+    },
+    {
+      "path": "C:\\Users\\petbl\\auto-video\\scripts\\check_hpsl_structure.mjs",
+      "exists": true,
+      "bytes": 1167,
+      "mtime": "2026-07-01T12:33:35.447Z"
+    },
+    {
+      "path": "C:\\Users\\petbl\\auto-video\\scripts\\lib\\hpsl-structure-analysis.mjs",
+      "exists": true,
+      "bytes": 3125,
+      "mtime": "2026-07-01T12:33:28.341Z"
+    },
+    {
+      "path": "C:\\Users\\petbl\\auto-video\\scripts\\lib\\script-structure-analysis.mjs",
+      "exists": true,
+      "bytes": 3381,
+      "mtime": "2026-07-01T12:32:40.889Z"
+    },
+    {
+      "path": "C:\\Users\\petbl\\auto-video\\scripts\\lib\\semantic-overlap-analysis.mjs",
+      "exists": true,
+      "bytes": 1915,
+      "mtime": "2026-07-01T12:32:49.997Z"
+    },
+    {
+      "path": "C:\\Users\\petbl\\auto-video\\scripts\\validate_segmented_export.py",
+      "exists": true,
+      "bytes": 16706,
+      "mtime": "2026-07-01T13:10:29.222Z"
+    },
+    {
+      "path": "C:\\Users\\petbl\\auto-video\\scripts\\concat_segments.mjs",
+      "exists": true,
+      "bytes": 7120,
+      "mtime": "2026-06-30T11:33:16.030Z"
+    },
+    {
+      "path": "C:\\Users\\petbl\\auto-video\\docs\\agent-handoff-contract.md",
+      "exists": true,
+      "bytes": 3131,
+      "mtime": "2026-07-01T13:05:19.479Z"
+    },
+    {
+      "path": "C:\\Users\\petbl\\auto-video\\docs\\agent-invocation-templates.md",
+      "exists": true,
+      "bytes": 3363,
+      "mtime": "2026-07-01T13:05:19.481Z"
+    },
+    {
+      "path": "C:\\Users\\petbl\\auto-video\\docs\\pipeline-artifact-map.md",
+      "exists": true,
+      "bytes": 3021,
+      "mtime": "2026-07-01T13:05:19.481Z"
+    }
+  ],
+  "optional": [
+    {
+      "path": "C:\\Users\\petbl\\hermes-studio\\research.md",
+      "exists": true,
+      "bytes": 18391,
+      "mtime": "2026-06-17T09:33:55.205Z"
+    },
+    {
+      "path": "C:\\Users\\petbl\\hermes-studio\\timeline.md",
+      "exists": false,
+      "bytes": null,
+      "mtime": null
+    },
+    {
+      "path": "C:\\Users\\petbl\\hermes-studio\\hermes-local\\data\\visual-memory.duckdb",
+      "exists": true,
+      "bytes": 536576,
+      "mtime": "2026-06-17T17:58:36.092Z"
+    },
+    {
+      "path": "C:\\Users\\petbl\\hermes-studio\\hermes-local\\package.json",
+      "exists": true,
+      "bytes": 16639,
+      "mtime": "2026-06-26T20:33:30.527Z"
+    }
+  ],
+  "roots": {
+    "autoVideo": "C:\\Users\\petbl\\auto-video",
+    "hermesStudio": "C:\\Users\\petbl\\hermes-studio",
+    "hermesLocal": "C:\\Users\\petbl\\hermes-studio\\hermes-local"
+  }
+}

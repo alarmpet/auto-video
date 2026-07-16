@@ -1,0 +1,9 @@
+{
+  "schemaVersion": "1.0.0",
+  "profileId": "gguljam-bible",
+  "mode": "legacy-compatibility",
+  "policyDocument": "auto-video.md",
+  "strictRelease": false,
+  "assemblerScript": "scripts/assembler.mjs",
+  "concatScript": "scripts/concat.mjs"
+}

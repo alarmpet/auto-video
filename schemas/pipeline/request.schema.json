@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "schemaVersion": { "type": "string", "const": "1.0.0" },
+    "jobId": { "type": "string", "pattern": "^job-[0-9]{8}-[0-9]{6}-[a-f0-9]{8}$" },
+    "profileId": { "type": "string" },
+    "inputMode": { "type": "string", "enum": ["reference", "genre"] },
+    "source": {
+      "type": "object",
+      "properties": {
+        "kind": { "type": "string", "enum": ["reference_title", "genre"] },
+        "value": { "type": "string", "minLength": 1 }
+      },
+      "required": ["kind", "value"],
+      "additionalProperties": false
+    },
+    "targetMinutes": { "type": "integer" },
+    "durationTolerance": { "type": "number" },
+    "approvalMode": { "type": "string", "const": "two-stage" },
+    "seed": { "type": "integer" },
+    "createdAt": { "type": "string" },
+    "optionalInstructions": { "type": "string" }
+  },
+  "required": [
+    "schemaVersion",
+    "jobId",
+    "profileId",
+    "inputMode",
+    "source",
+    "targetMinutes",
+    "durationTolerance",
+    "approvalMode",
+    "seed",
+    "createdAt"
+  ],
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": { "inputMode": { "const": "reference" } }
+      },
+      "then": {
+        "properties": {
+          "source": {
+            "properties": {
+              "kind": { "const": "reference_title" }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "inputMode": { "const": "genre" } }
+      },
+      "then": {
+        "properties": {
+          "source": {
+            "properties": {
+              "kind": { "const": "genre" }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

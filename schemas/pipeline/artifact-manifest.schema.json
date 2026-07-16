@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "schemaVersion": { "type": "string", "const": "1.0.0" },
+    "jobId": { "type": "string" },
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/artifact"
+      }
+    }
+  },
+  "required": ["schemaVersion", "jobId", "artifacts"],
+  "additionalProperties": false,
+  "$defs": {
+    "artifact": {
+      "type": "object",
+      "properties": {
+        "artifactId": { "type": "string" },
+        "logicalRole": { "type": "string" },
+        "path": { "type": "string" },
+        "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "schemaVersion": { "type": "string" },
+        "producerStage": { "type": "string" },
+        "gateStatus": { "type": "string", "enum": ["pass", "fail", "warning", "pending", "invalidated"] },
+        "dependencyHashes": {
+          "type": "object",
+          "additionalProperties": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+        },
+        "dependencyKinds": {
+          "type": "object",
+          "additionalProperties": { "type": "string", "enum": ["artifact", "opaque"] }
+        },
+        "dependencyOwners": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        },
+        "history": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "path": { "type": "string" },
+              "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+              "schemaVersion": { "type": "string" },
+              "producerStage": { "type": "string" },
+              "gateStatus": { "type": "string", "enum": ["pass", "fail", "warning", "pending", "invalidated"] },
+              "dependencyHashes": {
+                "type": "object",
+                "additionalProperties": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+              },
+              "dependencyKinds": {
+                "type": "object",
+                "additionalProperties": { "type": "string", "enum": ["artifact", "opaque"] }
+              },
+              "dependencyOwners": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                }
+              },
+              "replacedAt": { "type": "string" }
+            },
+            "required": ["path", "sha256", "schemaVersion", "producerStage", "gateStatus", "dependencyHashes", "dependencyKinds", "dependencyOwners", "replacedAt"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "artifactId",
+        "logicalRole",
+        "path",
+        "sha256",
+        "schemaVersion",
+        "producerStage",
+        "gateStatus",
+        "dependencyHashes",
+        "dependencyKinds",
+        "dependencyOwners"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

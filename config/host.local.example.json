@@ -1,0 +1,14 @@
+{
+  "schemaVersion": "1.0.0",
+  "workspaceRoot": "C:/Users/petbl/auto-video",
+  "exportsRoot": "C:/Users/petbl/auto-video/exports",
+  "codex": {
+    "executable": "C:/Users/petbl/AppData/Local/OpenAI/Codex/bin/a7c12ebff69fb123/codex.exe",
+    "verifiedVersion": "codex-cli 0.144.0-alpha.4",
+    "versionTimeoutMs": 15000
+  },
+  "ffmpeg": {
+    "executable": "C:/Users/petbl/AppData/Local/Microsoft/WinGet/Packages/Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe/ffmpeg-8.1.1-full_build/bin/ffmpeg.exe",
+    "ffprobeExecutable": "C:/Users/petbl/AppData/Local/Microsoft/WinGet/Packages/Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe/ffmpeg-8.1.1-full_build/bin/ffprobe.exe"
+  }
+}

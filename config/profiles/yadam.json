@@ -1,0 +1,52 @@
+{
+  "schemaVersion": "1.0.0",
+  "profileId": "yadam",
+  "targetMinutes": { "min": 10, "max": 120, "step": 10, "durationTolerance": 0.2 },
+  "segments": { "plannedSeconds": 600 },
+  "codex": {
+    "promptPack": "prompts/yadam",
+    "approval": "never",
+    "sandbox": "read-only",
+    "model": "gpt-5.6-sol",
+    "reasoningEffort": "ultra",
+    "ignoreUserConfig": true,
+    "ignoreExecpolicyRules": true,
+    "strictConfig": true,
+    "workingDirectoryPolicy": "dedicated-empty-stage-dir",
+    "projectRootMarkers": [],
+    "instructionSourcePolicy": "absent-or-profile-pinned",
+    "instructionSourcePins": {}
+  },
+  "tts": {
+    "provider": "supertonic",
+    "model": "supertonic-3",
+    "voice": "M1",
+    "language": "ko",
+    "speed": 1.04,
+    "totalStep": 8,
+    "sceneSilenceSeconds": 0.38,
+    "continuousSilenceSeconds": 0.04
+  },
+  "visual": {
+    "styleId": "yadam-color-manhwa-v1",
+    "sceneWidth": 1024,
+    "sceneHeight": 576,
+    "referenceWidth": 768,
+    "referenceHeight": 1024,
+    "thumbnailWidth": 1280,
+    "thumbnailHeight": 720,
+    "maxSlots": 260,
+    "focalConditionedCharacters": 1
+  },
+  "video": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 24,
+    "videoCodec": "h264",
+    "pixelFormat": "yuv420p",
+    "audioCodec": "aac",
+    "audioSampleRate": 48000,
+    "preserveColor": true
+  },
+  "strictRelease": true
+}

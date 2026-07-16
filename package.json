@@ -1,0 +1,15 @@
+{
+  "name": "auto-video-local-pipeline",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22.16.0" },
+  "scripts": {
+    "test:yadam": "node --test test/yadam",
+    "auto-video": "node scripts/auto-video-pipeline.mjs"
+  },
+  "dependencies": {
+    "ajv": "8.20.0",
+    "json-canonicalize": "2.0.0"
+  }
+}
