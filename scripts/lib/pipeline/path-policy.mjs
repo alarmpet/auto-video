@@ -4,7 +4,7 @@ import { isAbsolute, relative, resolve, sep } from "node:path";
 function outsideError(roots, candidate) {
   const error = new Error(`path is outside allowed root: ${resolve(candidate)}`);
   error.code = "path_outside_allowed_root";
-  error.details = { roots: roots.map(resolve), candidate: resolve(candidate) };
+  error.details = { roots: roots.map(r => resolve(r)), candidate: resolve(candidate) };
   return error;
 }
 

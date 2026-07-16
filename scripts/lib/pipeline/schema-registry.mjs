@@ -1,6 +1,11 @@
 import Ajv2020 from "ajv/dist/2020.js";
 import { readJson } from "./atomic-store.mjs";
-import { resolve } from "node:path";
+import { resolve, dirname, join } from "node:path";
+import { existsSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const REAL_PROJECT_ROOT = resolve(__dirname, "..", "..", "..");
 
 const ajv = new Ajv2020({
   allErrors: true,
@@ -11,7 +16,17 @@ const ajv = new Ajv2020({
 const compiledCache = new Map();
 
 export async function validateSchema(schemaPath, value) {
-  const absPath = resolve(schemaPath);
+  let absPath = resolve(schemaPath);
+  if (!existsSync(absPath)) {
+    const relativePart = schemaPath.includes("schemas")
+      ? schemaPath.slice(schemaPath.indexOf("schemas"))
+      : schemaPath;
+    const fallbackPath = resolve(REAL_PROJECT_ROOT, relativePart);
+    if (existsSync(fallbackPath)) {
+      absPath = fallbackPath;
+    }
+  }
+
   let validate = compiledCache.get(absPath);
   if (!validate) {
     let schemaJson;

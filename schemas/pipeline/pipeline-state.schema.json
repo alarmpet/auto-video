@@ -73,9 +73,11 @@
         "allOf": [
           {
             "if": {
-              "properties": { "attempt": { "const": 1 } }
+              "properties": { "attempt": { "const": 1 } },
+              "required": ["attempt"]
             },
             "then": {
+              "type": "object",
               "properties": {
                 "stage": { "const": "DURATION_REPAIR_REQUIRED" }
               }

@@ -39,6 +39,10 @@
             "items": { "type": "string" }
           }
         },
+        "invalidatedBy": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
         "history": {
           "type": "array",
           "items": {
@@ -63,6 +67,10 @@
                   "type": "array",
                   "items": { "type": "string" }
                 }
+              },
+              "invalidatedBy": {
+                "type": "array",
+                "items": { "type": "string" }
               },
               "replacedAt": { "type": "string" }
             },

@@ -5,7 +5,7 @@
   "type": "module",
   "engines": { "node": ">=22.16.0" },
   "scripts": {
-    "test:yadam": "node --test test/yadam",
+    "test:yadam": "node --test test/yadam/foundation.test.mjs test/yadam/codex-runner.test.mjs test/yadam/cli.test.mjs",
     "auto-video": "node scripts/auto-video-pipeline.mjs"
   },
   "dependencies": {

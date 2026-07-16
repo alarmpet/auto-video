@@ -5,7 +5,7 @@ import { writeCanonicalJson, readJson } from "./atomic-store.mjs";
 import { validateSchema } from "./schema-registry.mjs";
 
 const ALLOWED_TRANSITIONS = {
-  pending: ["running", "failed", "cancelled"],
+  pending: ["running", "failed", "cancelled", "cancel_requested"],
   running: ["running", "awaiting_approval", "retrying", "completed", "needs_review", "failed", "cancelled", "cancel_requested"],
   awaiting_approval: ["running", "completed", "failed", "cancelled"],
   retrying: ["running", "failed", "cancelled"],
@@ -16,7 +16,7 @@ const ALLOWED_TRANSITIONS = {
   cancelled: []
 };
 
-async function acquireLock(jobDir) {
+export async function acquireLock(jobDir) {
   const lockPath = join(jobDir, "pipeline.lock");
   const leaseId = randomBytes(8).toString("hex");
   const acquiredAt = new Date().toISOString();
@@ -87,7 +87,7 @@ async function acquireLock(jobDir) {
   }
 }
 
-async function releaseLock(jobDir, leaseId) {
+export async function releaseLock(jobDir, leaseId) {
   const lockPath = join(jobDir, "pipeline.lock");
   try {
     const text = await readFile(lockPath, "utf8");
@@ -137,7 +137,7 @@ export async function transitionJob(jobDir, event) {
       state.durationRepairAttemptsUsed = 1;
     }
 
-    const matchingRows = state.history.filter(r => r.stage === event.stage && r.inputHash === event.inputHash);
+    const matchingRows = state.history.filter(r => r.stage === event.stage && r.inputHash === event.inputHash && !r.error);
     if (matchingRows.length > 1) {
       const err = new Error("Success evidence conflict");
       err.code = "success_evidence_conflict";

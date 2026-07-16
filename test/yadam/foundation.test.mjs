@@ -11,6 +11,8 @@ import { validateSchema } from "../../scripts/lib/pipeline/schema-registry.mjs";
 import { createJob, loadJob } from "../../scripts/lib/pipeline/job-store.mjs";
 import { transitionJob } from "../../scripts/lib/pipeline/state-machine.mjs";
 import { buildSuccessEvidence } from "../../scripts/lib/pipeline/success-evidence.mjs";
+import { registerArtifact, canReuseArtifact } from "../../scripts/lib/pipeline/artifact-store.mjs";
+import { invalidateFromChanges } from "../../scripts/lib/pipeline/dependency-graph.mjs";
 
 test("test harness runs as ESM", () => {
   assert.equal(import.meta.url.startsWith("file:"), true);
@@ -462,3 +464,132 @@ test("buildSuccessEvidence canonicalizes inputs, outputs, and opaque hashes", ()
 
   assert.throws(() => buildSuccessEvidence("stage-test", inputs, outputs, { invalidKey: opaque.modelHash }));
 });
+
+test("artifact registration, reuse, and transitive invalidation", async () => {
+  const root = await mkdtemp(join(tmpdir(), "yadam-artifacts-"));
+  const exportsDir = join(root, "exports");
+  await mkdir(exportsDir, { recursive: true });
+
+  const hostConfig = {
+    schemaVersion: "1.0.0",
+    workspaceRoot: root,
+    exportsRoot: exportsDir,
+  };
+  const profile = await loadProfile("yadam", "C:/Users/petbl/auto-video");
+  const request = {
+    schemaVersion: "1.0.0",
+    profileId: "yadam",
+    inputMode: "genre",
+    source: { kind: "genre", value: "test" },
+    targetMinutes: 10,
+    durationTolerance: 0.20,
+    approvalMode: "two-stage",
+    seed: 1,
+    createdAt: new Date().toISOString()
+  };
+
+  try {
+    const context = await createJob({ workspaceRoot: root, request, profile, hostConfig });
+    const jobDir = context.jobDir;
+
+    const scriptPath = join(jobDir, "planning", "script.json");
+    const scriptVal = { content: "original script" };
+    const scriptWrite = await writeCanonicalJson(scriptPath, scriptVal);
+
+    const wavPath = join(jobDir, "assets/audio/raw", "audio.wav");
+    const wavBytes = Buffer.from("fake wav data");
+    const wavWrite = await writeBinaryAtomic(wavPath, wavBytes);
+
+    const scriptRecord = await registerArtifact(jobDir, {
+      artifactId: "script-final",
+      logicalRole: "pipeline.script",
+      path: "planning/script.json",
+      sha256: scriptWrite.sha256,
+      schemaVersion: "1.0.0",
+      producerStage: "script-generation",
+      gateStatus: "pass",
+      dependencyHashes: {}
+    });
+    assert.equal(scriptRecord.gateStatus, "pass");
+
+    const wavRecord = await registerArtifact(jobDir, {
+      artifactId: "audio-raw",
+      logicalRole: "pipeline.audio.raw",
+      path: "assets/audio/raw/audio.wav",
+      sha256: wavWrite.sha256,
+      schemaVersion: "1.0.0",
+      producerStage: "audio-generation",
+      gateStatus: "pass",
+      dependencyHashes: {
+        "script-final": scriptWrite.sha256
+      }
+    });
+    assert.equal(wavRecord.dependencyKinds["script-final"], "artifact");
+    assert.deepEqual(wavRecord.dependencyOwners["script-final"], ["script-final"]);
+
+    const reuseScript = await canReuseArtifact(jobDir, "script-final", {});
+    assert.equal(reuseScript, true);
+
+    const reuseWav = await canReuseArtifact(jobDir, "audio-raw", {
+      "script-final": scriptWrite.sha256
+    });
+    assert.equal(reuseWav, true);
+
+    const scriptVal2 = { content: "modified script" };
+    const scriptWrite2 = await writeCanonicalJson(scriptPath, scriptVal2);
+    const scriptRecord2 = await registerArtifact(jobDir, {
+      artifactId: "script-final",
+      logicalRole: "pipeline.script",
+      path: "planning/script.json",
+      sha256: scriptWrite2.sha256,
+      schemaVersion: "1.0.0",
+      producerStage: "script-generation",
+      gateStatus: "pass",
+      dependencyHashes: {}
+    });
+    assert.equal(scriptRecord2.sha256, scriptWrite2.sha256);
+    assert.equal(scriptRecord2.history.length, 1);
+    assert.equal(scriptRecord2.history[0].sha256, scriptWrite.sha256);
+
+    const updatedManifest = await invalidateFromChanges(jobDir, ["script-final"]);
+    const invalidatedWav = updatedManifest.artifacts.find(a => a.artifactId === "audio-raw");
+    assert.equal(invalidatedWav.gateStatus, "invalidated");
+    assert.deepEqual(invalidatedWav.invalidatedBy, ["script-final"]);
+
+    const reuseWavAfterInvalidation = await canReuseArtifact(jobDir, "audio-raw", {
+      "script-final": scriptWrite.sha256
+    });
+    assert.equal(reuseWavAfterInvalidation, false);
+
+    const checkpointPath = join(jobDir, "assets/audio/checkpoints", "cp.bin");
+    const cpWrite = await writeBinaryAtomic(checkpointPath, Buffer.from("checkpoint bytes"));
+    const finalRecord = await registerArtifact(jobDir, {
+      artifactId: "audio-final",
+      logicalRole: "pipeline.audio.final",
+      path: "assets/audio/checkpoints/cp.bin",
+      sha256: cpWrite.sha256,
+      schemaVersion: "1.0.0",
+      producerStage: "audio-processing",
+      gateStatus: "pass",
+      dependencyHashes: {
+        "external-model": "0000000000000000000000000000000000000000000000000000000000000aaa"
+      }
+    });
+    assert.equal(finalRecord.dependencyKinds["external-model"], "opaque");
+    assert.equal(finalRecord.dependencyOwners["external-model"], undefined);
+
+    const reuseFinalSame = await canReuseArtifact(jobDir, "audio-final", {
+      "external-model": "0000000000000000000000000000000000000000000000000000000000000aaa"
+    });
+    assert.equal(reuseFinalSame, true);
+
+    const reuseFinalDifferent = await canReuseArtifact(jobDir, "audio-final", {
+      "external-model": "0000000000000000000000000000000000000000000000000000000000000bbb"
+    });
+    assert.equal(reuseFinalDifferent, false);
+
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+

@@ -20,7 +20,7 @@
     "approvalMode": { "type": "string", "const": "two-stage" },
     "seed": { "type": "integer" },
     "createdAt": { "type": "string" },
-    "optionalInstructions": { "type": "string" }
+    "optionalInstructions": { "type": "string", "default": "" }
   },
   "required": [
     "schemaVersion",
@@ -43,6 +43,7 @@
       "then": {
         "properties": {
           "source": {
+            "type": "object",
             "properties": {
               "kind": { "const": "reference_title" }
             }
@@ -57,6 +58,7 @@
       "then": {
         "properties": {
           "source": {
+            "type": "object",
             "properties": {
               "kind": { "const": "genre" }
             }
