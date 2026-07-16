@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://auto-video/schemas/yadam/script-plan.schema.json/v1",
+  "type": "object",
+  "properties": {
+    "schemaVersion": { "type": "string", "const": "1.0.0" },
+    "jobId": { "type": "string" },
+    "segments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "segmentId": { "type": "string", "pattern": "^segment-[0-9]{2}$" },
+          "chapterIndex": { "type": "integer" },
+          "beats": { "type": "array", "items": { "type": "string" } },
+          "targetCharacters": { "type": "integer" }
+        },
+        "required": ["segmentId", "chapterIndex", "beats", "targetCharacters"],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["schemaVersion", "jobId", "segments"],
+  "additionalProperties": false
+}

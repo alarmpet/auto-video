@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://auto-video/schemas/yadam/hook-brief.schema.json/v1",
+  "type": "object",
+  "properties": {
+    "schemaVersion": { "type": "string", "const": "1.0.0" },
+    "jobId": { "type": "string" },
+    "stageId": { "type": "string" },
+    "inputHash": { "type": "string" },
+    "sentences": {
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 6,
+      "items": {
+        "type": "object",
+        "properties": {
+          "ordinal": { "type": "integer" },
+          "text": { "type": "string" },
+          "role": { "type": "string" }
+        },
+        "required": ["ordinal", "text", "role"],
+        "additionalProperties": false
+      }
+    },
+    "characterCount": { "type": "integer", "minimum": 200, "maximum": 350 }
+  },
+  "required": ["schemaVersion", "jobId", "stageId", "inputHash", "sentences", "characterCount"],
+  "additionalProperties": false
+}

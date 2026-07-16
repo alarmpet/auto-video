@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://auto-video/schemas/yadam/duration-repair.schema.json/v1",
+  "type": "object",
+  "properties": {
+    "schemaVersion": { "type": "string", "const": "1.0.0" },
+    "jobId": { "type": "string" },
+    "stageId": { "type": "string" },
+    "inputHash": { "type": "string" },
+    "changedSegments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "segmentId": { "type": "string" },
+          "text": { "type": "string" }
+        },
+        "required": ["segmentId", "text"],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["schemaVersion", "jobId", "stageId", "inputHash", "changedSegments"],
+  "additionalProperties": false
+}

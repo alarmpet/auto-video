@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://auto-video/schemas/yadam/story-bible.schema.json/v1",
+  "type": "object",
+  "properties": {
+    "schemaVersion": { "type": "string", "const": "1.0.0" },
+    "jobId": { "type": "string" },
+    "stageId": { "type": "string" },
+    "inputHash": { "type": "string" },
+    "title": { "type": "string" },
+    "themeLine": { "type": "string" },
+    "characters": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "characterId": { "type": "string" },
+          "name": { "type": "string" },
+          "classId": { "type": "string" },
+          "gender": { "type": "string" },
+          "prominence": { "type": "string" },
+          "description": { "type": "string" },
+          "requiresSurname": { "type": "boolean" },
+          "surnameId": { "type": ["string", "null"] },
+          "givenNameId": { "type": "string" }
+        },
+        "required": ["characterId", "name", "classId", "gender", "prominence", "description"],
+        "additionalProperties": false
+      }
+    },
+    "locations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "locationId": { "type": "string" },
+          "name": { "type": "string" },
+          "description": { "type": "string" }
+        },
+        "required": ["locationId", "name", "description"],
+        "additionalProperties": false
+      }
+    },
+    "props": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "propId": { "type": "string" },
+          "name": { "type": "string" },
+          "description": { "type": "string" }
+        },
+        "required": ["propId", "name", "description"],
+        "additionalProperties": false
+      }
+    },
+    "spoilerSealIds": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+  "required": ["schemaVersion", "jobId", "stageId", "inputHash", "title", "themeLine", "characters", "locations", "props", "spoilerSealIds"],
+  "additionalProperties": false
+}

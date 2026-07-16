@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://auto-video/schemas/yadam/thumbnail-plan.schema.json/v1",
+  "type": "object",
+  "properties": {
+    "schemaVersion": { "type": "string", "const": "1.0.0" },
+    "jobId": { "type": "string" },
+    "stageId": { "type": "string" },
+    "inputHash": { "type": "string" },
+    "options": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": {
+        "type": "object",
+        "properties": {
+          "copyId": { "type": "string", "pattern": "^copy-[0-9]{2}$" },
+          "copyText": { "type": "string" },
+          "layout": { "type": "string", "enum": ["left-panel-4", "right-panel-4", "bottom-band-2"] }
+        },
+        "required": ["copyId", "copyText", "layout"],
+        "additionalProperties": false
+      }
+    },
+    "recommendedCopyId": { "type": "string", "pattern": "^copy-[0-9]{2}$" },
+    "recommendationReason": { "type": "string" }
+  },
+  "required": ["schemaVersion", "jobId", "stageId", "inputHash", "options", "recommendedCopyId", "recommendationReason"],
+  "additionalProperties": false
+}

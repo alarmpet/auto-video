@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://auto-video/schemas/yadam/script-scenes.schema.json/v1",
+  "type": "object",
+  "properties": {
+    "schemaVersion": { "type": "string", "const": "1.0.0" },
+    "jobId": { "type": "string" },
+    "scenes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "sceneId": { "type": "string", "pattern": "^scene-[0-9]{4}$" },
+          "segmentId": { "type": "string", "pattern": "^segment-[0-9]{2}$" },
+          "ordinal": { "type": "integer" },
+          "sourceText": { "type": "string" },
+          "sourceHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "ttsNormalizedText": { "type": "string" },
+          "ttsNormalizedHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "ttsOptionsHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+        },
+        "required": ["sceneId", "segmentId", "ordinal", "sourceText", "sourceHash", "ttsNormalizedText", "ttsNormalizedHash", "ttsOptionsHash"],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["schemaVersion", "jobId", "scenes"],
+  "additionalProperties": false
+}

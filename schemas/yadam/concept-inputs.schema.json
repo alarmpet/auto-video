@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://auto-video/schemas/yadam/concept-inputs.schema.json/v1",
+  "type": "object",
+  "properties": {
+    "schemaVersion": { "type": "string", "const": "1.0.0" },
+    "jobId": { "type": "string" },
+    "inputMode": { "type": "string", "enum": ["reference", "genre"] },
+    "seed": { "type": "integer" },
+    "targetMinutes": { "type": "integer" },
+    "referenceHashes": {
+      "type": "object",
+      "properties": {
+        "names": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "motifs": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "beats": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "rules": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+      },
+      "required": ["names", "motifs", "beats", "rules"],
+      "additionalProperties": false
+    },
+    "requestHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "historyHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "history": {
+      "type": "array",
+      "maxItems": 20,
+      "items": {
+        "type": "object",
+        "properties": {
+          "jobId": { "type": "string" },
+          "completedAt": { "type": "string" },
+          "nameIds": { "type": "array", "items": { "type": "string" } },
+          "motifIds": { "type": "array", "items": { "type": "string" } },
+          "twistCategories": { "type": "array", "items": { "type": "string" } },
+          "themeLine": { "type": "string" },
+          "titleFingerprint": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+        },
+        "required": ["jobId", "completedAt", "nameIds", "motifIds", "twistCategories", "themeLine", "titleFingerprint"],
+        "additionalProperties": false
+      }
+    },
+    "source": {
+      "type": "object",
+      "properties": {
+        "kind": { "type": "string" },
+        "value": { "type": "string" }
+      },
+      "required": ["kind", "value"],
+      "additionalProperties": false
+    },
+    "candidates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "candidateId": { "type": "string" },
+          "title": { "type": "string" },
+          "themeLine": { "type": "string" },
+          "motifId": { "type": "string" },
+          "motifs": { "type": "array", "items": { "type": "string" } }
+        },
+        "required": ["candidateId"],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["schemaVersion", "jobId", "inputMode", "seed", "targetMinutes", "referenceHashes", "requestHash", "historyHash", "history"],
+  "additionalProperties": false
+}

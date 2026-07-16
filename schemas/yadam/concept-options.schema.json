@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://auto-video/schemas/yadam/concept-options.schema.json/v1",
+  "type": "object",
+  "properties": {
+    "schemaVersion": { "type": "string", "const": "1.0.0" },
+    "jobId": { "type": "string" },
+    "stageId": { "type": "string" },
+    "inputHash": { "type": "string" },
+    "conceptInputsHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "options": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 4,
+      "items": {
+        "type": "object",
+        "properties": {
+          "candidateId": { "type": "string", "pattern": "^concept-c0[1-4]$" },
+          "title": { "type": "string" },
+          "themeLine": { "type": "string" },
+          "motifId": { "type": "string", "pattern": "^motif:m[0-9]{2}$" },
+          "castProposals": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "role": { "type": "string" },
+                "name": { "type": "string" },
+                "nameId": { "type": "string" },
+                "classId": { "type": "string" },
+                "gender": { "type": "string" },
+                "prominence": { "type": "string" }
+              },
+              "required": ["role", "name", "nameId", "classId", "gender", "prominence"],
+              "additionalProperties": false
+            }
+          },
+          "twistCategoryProposals": {
+            "type": "array",
+            "minItems": 6,
+            "maxItems": 6,
+            "items": { "type": "string" }
+          },
+          "spoilerSealIds": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        },
+        "required": ["candidateId", "title", "themeLine", "motifId", "castProposals", "twistCategoryProposals", "spoilerSealIds"],
+        "additionalProperties": false
+      }
+    },
+    "recommendedCandidateId": { "type": "string", "pattern": "^concept-c0[1-4]$" },
+    "recommendationReason": { "type": "string", "minLength": 1 }
+  },
+  "required": ["schemaVersion", "jobId", "stageId", "inputHash", "conceptInputsHash", "options", "recommendedCandidateId", "recommendationReason"],
+  "additionalProperties": false
+}

@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://auto-video/schemas/yadam/approval.schema.json/v1",
+  "oneOf": [
+    {
+      "properties": {
+        "documentType": { "const": "approval_1_bundle" },
+        "schemaVersion": { "const": "1.0.0" },
+        "status": { "const": "valid" },
+        "revision": { "type": "integer" },
+        "path": { "type": "string" },
+        "sha256": { "type": "string" },
+        "approvedArtifactSetHash": { "type": "string" }
+      },
+      "required": ["documentType", "schemaVersion", "status", "revision", "path", "sha256", "approvedArtifactSetHash"],
+      "additionalProperties": false
+    },
+    {
+      "properties": {
+        "documentType": { "const": "approval_2_bundle" },
+        "schemaVersion": { "const": "1.0.0" },
+        "status": { "const": "valid" },
+        "revision": { "type": "integer" },
+        "candidateApprovalRevision": { "type": "integer" },
+        "path": { "type": "string" },
+        "sha256": { "type": "string" },
+        "approvedArtifactSetHash": { "type": "string" },
+        "artifacts": { "type": "array" }
+      },
+      "required": ["documentType", "schemaVersion", "status", "revision", "candidateApprovalRevision", "path", "sha256", "approvedArtifactSetHash", "artifacts"],
+      "additionalProperties": false
+    },
+    {
+      "properties": {
+        "documentType": { "const": "approval_invalidated" },
+        "schemaVersion": { "const": "1.0.0" },
+        "status": { "const": "invalidated" },
+        "revision": { "type": "integer" },
+        "path": { "type": "string" },
+        "sha256": { "type": "string" },
+        "approvedArtifactSetHash": { "type": "string" },
+        "invalidatedAt": { "type": "string" },
+        "reason": { "type": "string" },
+        "observedDependencyHash": { "type": "string" }
+      },
+      "required": ["documentType", "schemaVersion", "status", "revision", "path", "sha256", "approvedArtifactSetHash", "invalidatedAt", "reason", "observedDependencyHash"],
+      "additionalProperties": false
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://auto-video/schemas/yadam/coverage-report.schema.json/v1",
+  "type": "object",
+  "properties": {
+    "schemaVersion": { "type": "string", "const": "1.0.0" },
+    "jobId": { "type": "string" },
+    "sections": {
+      "type": "object",
+      "properties": {
+        "script": { "type": "string", "enum": ["pass", "warning", "fail"] },
+        "audio": { "type": "string", "enum": ["pending", "pass", "warning", "fail"] },
+        "subtitle": { "type": "string", "enum": ["pending", "pass", "warning", "fail"] },
+        "visual": { "type": "string", "enum": ["pending", "pass", "warning", "fail"] }
+      },
+      "required": ["script", "audio", "subtitle", "visual"],
+      "additionalProperties": false
+    },
+    "audioSection": {
+      "type": ["object", "null"],
+      "properties": {
+        "relativePath": { "type": "string" },
+        "sha256": { "type": "string" },
+        "revision": { "type": "integer" }
+      },
+      "required": ["relativePath", "sha256", "revision"],
+      "additionalProperties": false
+    },
+    "subtitleSection": {
+      "type": ["object", "null"],
+      "properties": {
+        "relativePath": { "type": "string" },
+        "sha256": { "type": "string" },
+        "revision": { "type": "integer" }
+      },
+      "required": ["relativePath", "sha256", "revision"],
+      "additionalProperties": false
+    },
+    "visualSection": {
+      "type": ["object", "null"],
+      "properties": {
+        "relativePath": { "type": "string" },
+        "sha256": { "type": "string" },
+        "revision": { "type": "integer" }
+      },
+      "required": ["relativePath", "sha256", "revision"],
+      "additionalProperties": false
+    }
+  },
+  "required": ["schemaVersion", "jobId", "sections"],
+  "additionalProperties": false
+}

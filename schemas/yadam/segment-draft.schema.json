@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://auto-video/schemas/yadam/segment-draft.schema.json/v1",
+  "type": "object",
+  "properties": {
+    "schemaVersion": { "type": "string", "const": "1.0.0" },
+    "jobId": { "type": "string" },
+    "stageId": { "type": "string" },
+    "inputHash": { "type": "string" },
+    "segmentId": { "type": "string", "pattern": "^segment-[0-9]{2}$" },
+    "text": { "type": "string" }
+  },
+  "required": ["schemaVersion", "jobId", "stageId", "inputHash", "segmentId", "text"],
+  "additionalProperties": false
+}

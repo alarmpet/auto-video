@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://auto-video/schemas/yadam/outline.schema.json/v1",
+  "type": "object",
+  "properties": {
+    "schemaVersion": { "type": "string", "const": "1.0.0" },
+    "jobId": { "type": "string" },
+    "stageId": { "type": "string" },
+    "inputHash": { "type": "string" },
+    "beats": {
+      "type": "array",
+      "minItems": 15,
+      "maxItems": 15,
+      "items": {
+        "type": "object",
+        "properties": {
+          "beatId": { "type": "string", "pattern": "^beat-[0-9]{2}$" },
+          "summary": { "type": "string" }
+        },
+        "required": ["beatId", "summary"],
+        "additionalProperties": false
+      }
+    },
+    "twists": {
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 6,
+      "items": {
+        "type": "object",
+        "properties": {
+          "twistId": { "type": "string", "pattern": "^twist-[0-9]{2}$" },
+          "description": { "type": "string" }
+        },
+        "required": ["twistId", "description"],
+        "additionalProperties": false
+      }
+    },
+    "emotionPoints": {
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 6,
+      "items": {
+        "type": "object",
+        "properties": {
+          "emotionPointId": { "type": "string", "pattern": "^emotion-[0-9]{2}$" },
+          "description": { "type": "string" }
+        },
+        "required": ["emotionPointId", "description"],
+        "additionalProperties": false
+      }
+    },
+    "themePlacements": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "properties": {
+          "themePlacementId": { "type": "string", "pattern": "^theme-[0-9]{2}$" },
+          "beatId": { "type": "string" },
+          "description": { "type": "string" }
+        },
+        "required": ["themePlacementId", "beatId", "description"],
+        "additionalProperties": false
+      }
+    },
+    "foreshadowing": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "foreshadowId": { "type": "string", "pattern": "^foreshadow-[0-9]+$" },
+          "plantBeatId": { "type": "string" },
+          "recoveryBeatId": { "type": "string" },
+          "description": { "type": "string" }
+        },
+        "required": ["foreshadowId", "plantBeatId", "recoveryBeatId", "description"],
+        "additionalProperties": false
+      }
+    },
+    "finaleStages": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "properties": {
+          "finaleStageId": { "type": "string", "pattern": "^finale-[0-9]{2}$" },
+          "description": { "type": "string" }
+        },
+        "required": ["finaleStageId", "description"],
+        "additionalProperties": false
+      }
+    },
+    "fixedEnding": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": { "type": "string" }
+    }
+  },
+  "required": ["schemaVersion", "jobId", "stageId", "inputHash", "beats", "twists", "emotionPoints", "themePlacements", "foreshadowing", "finaleStages", "fixedEnding"],
+  "additionalProperties": false
+}
