@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://auto-video/schemas/yadam/audio-normalization-report.schema.json/v1",
+  "type": "object",
+  "properties": {
+    "schemaVersion": { "type": "string", "const": "1.0.0" },
+    "profileId": { "type": "string", "const": "yadam" },
+    "jobId": { "type": "string" },
+    "rows": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "sceneId": { "type": "string" },
+          "segmentId": { "type": "string" },
+          "order": { "type": "integer", "minimum": 1 },
+          "sourceHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "ttsNormalizedHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "ttsOptionsHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "transport": { "type": "string", "enum": ["http", "cli"] },
+          "providerJobId": { "type": ["string", "null"] },
+          "rawPath": { "type": "string", "pattern": "^(?!/)(?!^[a-zA-Z]:).+$" },
+          "rawSha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "normalizedPath": { "type": "string", "pattern": "^(?!/)(?!^[a-zA-Z]:).+$" },
+          "normalizedSha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "media": {
+            "type": "object",
+            "properties": {
+              "codec": { "type": "string", "const": "pcm_s16le" },
+              "sampleFormat": { "type": "string", "const": "s16" },
+              "sampleRate": { "type": "integer", "const": 48000 },
+              "channels": { "type": "integer", "const": 1 },
+              "channelLayout": { "type": "string", "const": "mono" },
+              "durationSeconds": { "type": "number", "exclusiveMinimum": 0 }
+            },
+            "required": ["codec", "sampleFormat", "sampleRate", "channels", "channelLayout", "durationSeconds"],
+            "additionalProperties": false
+          },
+          "attempts": { "type": "integer", "minimum": 1 },
+          "elapsedMs": { "type": "number", "minimum": 0 },
+          "providerProvenance": { "type": ["object", "null"] }
+        },
+        "required": [
+          "sceneId", "segmentId", "order", "sourceHash", "ttsNormalizedHash", "ttsOptionsHash",
+          "transport", "providerJobId", "rawPath", "rawSha256", "normalizedPath", "normalizedSha256",
+          "media", "attempts", "elapsedMs", "providerProvenance"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "dependencyHashes": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+    }
+  },
+  "required": ["schemaVersion", "profileId", "jobId", "rows", "dependencyHashes"],
+  "additionalProperties": false
+}

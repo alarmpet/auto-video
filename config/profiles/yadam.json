@@ -25,7 +25,20 @@
     "speed": 1.04,
     "totalStep": 8,
     "sceneSilenceSeconds": 0.38,
-    "continuousSilenceSeconds": 0.04
+    "continuousSilenceSeconds": 0.04,
+    "productionEndpoint": "/api/tts-job",
+    "diagnosticEndpoint": "/api/tts",
+    "pollIntervalMs": 1000,
+    "sceneTimeoutMs": 900000,
+    "requestTimeoutMs": 15000,
+    "transientAttempts": 3,
+    "normalizedAudio": {
+      "codec": "pcm_s16le",
+      "sampleFormat": "s16",
+      "sampleRate": 48000,
+      "channels": 1,
+      "channelLayout": "mono"
+    }
   },
   "visual": {
     "styleId": "yadam-color-manhwa-v1",

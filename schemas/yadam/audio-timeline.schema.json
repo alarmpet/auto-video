@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://auto-video/schemas/yadam/audio-timeline.schema.json/v1",
+  "type": "object",
+  "properties": {
+    "schemaVersion": { "type": "string", "const": "1.0.0" },
+    "profileId": { "type": "string", "const": "yadam" },
+    "jobId": { "type": "string" },
+    "measuredAudioSeconds": { "type": "number", "exclusiveMinimum": 0 },
+    "audioTempoFactor": { "type": "number", "const": 1 },
+    "scenes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "sceneId": { "type": "string" },
+          "segmentId": { "type": "string" },
+          "order": { "type": "integer", "minimum": 1 },
+          "sourceHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "ttsNormalizedHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "ttsOptionsHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "normalizedWavPath": { "type": "string" },
+          "normalizedWavHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "durationSeconds": { "type": "number", "exclusiveMinimum": 0 },
+          "startSeconds": { "type": "number", "minimum": 0 },
+          "endSeconds": { "type": "number", "exclusiveMinimum": 0 }
+        },
+        "required": [
+          "sceneId", "segmentId", "order", "sourceHash", "ttsNormalizedHash", "ttsOptionsHash",
+          "normalizedWavPath", "normalizedWavHash", "durationSeconds", "startSeconds", "endSeconds"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "segments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "segmentId": { "type": "string" },
+          "plannedDurationSeconds": { "type": "integer", "const": 600 },
+          "measuredAudioSeconds": { "type": "number", "exclusiveMinimum": 0 },
+          "startSeconds": { "type": "number", "minimum": 0 },
+          "endSeconds": { "type": "number", "exclusiveMinimum": 0 }
+        },
+        "required": ["segmentId", "plannedDurationSeconds", "measuredAudioSeconds", "startSeconds", "endSeconds"],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["schemaVersion", "profileId", "jobId", "measuredAudioSeconds", "audioTempoFactor", "scenes", "segments"],
+  "additionalProperties": false
+}

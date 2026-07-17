@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://auto-video/schemas/yadam/audio-manifest.schema.json/v1",
+  "type": "object",
+  "properties": {
+    "schemaVersion": { "type": "string", "const": "1.0.0" },
+    "profileId": { "type": "string", "const": "yadam" },
+    "jobId": { "type": "string" },
+    "approvalRevisionPath": { "type": "string" },
+    "approvalRevisionHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "finalTextHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "scriptScenesHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "normalizationReportPath": { "type": "string" },
+    "normalizationReportHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "measuredAudioSeconds": { "type": "number", "exclusiveMinimum": 0 },
+    "acceptedRangeSeconds": {
+      "type": "object",
+      "properties": {
+        "minimum": { "type": "number", "exclusiveMinimum": 0 },
+        "maximum": { "type": "number", "exclusiveMinimum": 0 }
+      },
+      "required": ["minimum", "maximum"],
+      "additionalProperties": false
+    },
+    "audioTempoFactor": { "type": "number", "const": 1 },
+    "scenes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "sceneId": { "type": "string" },
+          "segmentId": { "type": "string" },
+          "order": { "type": "integer", "minimum": 1 },
+          "sourceHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "ttsNormalizedHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "ttsOptionsHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "normalizedWavPath": { "type": "string" },
+          "normalizedWavHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "durationSeconds": { "type": "number", "exclusiveMinimum": 0 }
+        },
+        "required": [
+          "sceneId", "segmentId", "order", "sourceHash", "ttsNormalizedHash", "ttsOptionsHash",
+          "normalizedWavPath", "normalizedWavHash", "durationSeconds"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "schemaVersion", "profileId", "jobId", "approvalRevisionPath", "approvalRevisionHash",
+    "finalTextHash", "scriptScenesHash", "normalizationReportPath", "normalizationReportHash",
+    "measuredAudioSeconds", "acceptedRangeSeconds", "audioTempoFactor", "scenes"
+  ],
+  "additionalProperties": false
+}

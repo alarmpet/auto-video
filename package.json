@@ -5,7 +5,7 @@
   "type": "module",
   "engines": { "node": ">=22.16.0" },
   "scripts": {
-    "test:yadam:node": "node --test test/yadam/foundation.test.mjs test/yadam/codex-runner.test.mjs test/yadam/cli.test.mjs",
+    "test:yadam:node": "node --test test/yadam/foundation.test.mjs test/yadam/codex-runner.test.mjs test/yadam/cli.test.mjs test/yadam/tts-contract.test.mjs test/yadam/supertonic-http.test.mjs test/yadam/supertonic-cli.test.mjs test/yadam/audio-normalization.test.mjs test/yadam/tts-resume.test.mjs test/yadam/audio-timeline.test.mjs test/yadam/duration-repair-tts.test.mjs",
     "test:yadam:script": "node scripts/run-yadam-script-tests.mjs",
     "test:yadam": "npm run test:yadam:node && npm run test:yadam:script",
     "auto-video": "node scripts/auto-video-pipeline.mjs"

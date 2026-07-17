@@ -10,5 +10,16 @@
   "ffmpeg": {
     "executable": "C:/Users/petbl/AppData/Local/Microsoft/WinGet/Packages/Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe/ffmpeg-8.1.1-full_build/bin/ffmpeg.exe",
     "ffprobeExecutable": "C:/Users/petbl/AppData/Local/Microsoft/WinGet/Packages/Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe/ffmpeg-8.1.1-full_build/bin/ffprobe.exe"
+  },
+  "supertonic": {
+    "baseUrl": "http://127.0.0.1:3093",
+    "allowedOutputRoots": [
+      "C:/Users/petbl/supertonic3-local-tts-20260517-r4/supertonic3-local-tts/data"
+    ],
+    "cli": {
+      "pythonExecutable": "C:/Users/petbl/supertonic3-local-tts-20260517-r4/supertonic3-local-tts/.venv-win/Scripts/python.exe",
+      "scriptPath": "C:/Users/petbl/supertonic3-local-tts-20260517-r4/supertonic3-local-tts/src/supertonic3_cli.py",
+      "cwd": "C:/Users/petbl/supertonic3-local-tts-20260517-r4/supertonic3-local-tts/src"
+    }
   }
 }

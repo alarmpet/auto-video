@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://auto-video/schemas/yadam/audio-needs-review.schema.json/v1",
+  "type": "object",
+  "properties": {
+    "schemaVersion": { "type": "string", "const": "1.0.0" },
+    "reportType": { "type": "string", "const": "yadam_audio_needs_review" },
+    "jobId": { "type": "string" },
+    "status": { "type": "string", "const": "needs_review" },
+    "errorCode": {
+      "type": "string",
+      "enum": [
+        "duration_repair_failed",
+        "supertonic_submission_ambiguous",
+        "approval1_invalidated",
+        "repaired_duration_out_of_range"
+      ]
+    },
+    "createdAt": { "type": "string" },
+    "inputHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "measuredAudioSeconds": { "type": "number" },
+    "acceptedRangeSeconds": {
+      "type": "object",
+      "properties": {
+        "minimum": { "type": "number" },
+        "maximum": { "type": "number" }
+      },
+      "required": ["minimum", "maximum"],
+      "additionalProperties": false
+    },
+    "repairAttempt": { "type": "integer", "enum": [0, 1] },
+    "providerOrphan": {
+      "type": ["object", "null"],
+      "properties": {
+        "sceneId": { "type": "string" },
+        "requestHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "providerJobId": { "type": ["string", "null"] },
+        "checkpointPath": { "type": "string" }
+      },
+      "required": ["sceneId", "requestHash", "providerJobId", "checkpointPath"],
+      "additionalProperties": false
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "artifactId": { "type": "string" },
+          "path": { "type": "string" },
+          "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+        },
+        "required": ["artifactId", "path", "sha256"],
+        "additionalProperties": false
+      }
+    },
+    "dependencyHashes": {
+      "type": "object",
+      "additionalProperties": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+    }
+  },
+  "required": [
+    "schemaVersion", "reportType", "jobId", "status", "errorCode", "createdAt", "inputHash",
+    "measuredAudioSeconds", "acceptedRangeSeconds", "repairAttempt", "providerOrphan",
+    "evidence", "dependencyHashes"
+  ],
+  "additionalProperties": false
+}

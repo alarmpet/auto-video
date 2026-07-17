@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://auto-video/schemas/yadam/tts-scene-checkpoint.schema.json/v1",
+  "type": "object",
+  "properties": {
+    "schemaVersion": { "type": "string", "const": "1.0.0" },
+    "sceneId": { "type": "string" },
+    "requestHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "idempotencyKey": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "submitted",
+        "polling",
+        "provider_done",
+        "raw_verified",
+        "normalized",
+        "cancel_requested",
+        "orphaned",
+        "failed"
+      ]
+    },
+    "transport": { "type": ["string", "null"], "enum": ["http", "cli", null] },
+    "attempt": { "type": "integer", "minimum": 1, "maximum": 3 },
+    "updatedAt": { "type": "string" },
+    "providerJobId": { "type": ["string", "null"] },
+    "providerResult": { "type": ["object", "null"] },
+    "rawAsset": { "type": ["object", "null"] },
+    "normalizedAsset": { "type": ["object", "null"] },
+    "error": { "type": ["object", "null"] }
+  },
+  "required": [
+    "schemaVersion",
+    "sceneId",
+    "requestHash",
+    "idempotencyKey",
+    "status",
+    "transport",
+    "attempt",
+    "updatedAt"
+  ],
+  "additionalProperties": false
+}
