@@ -21,5 +21,16 @@
       "scriptPath": "C:/Users/petbl/supertonic3-local-tts-20260517-r4/supertonic3-local-tts/src/supertonic3_cli.py",
       "cwd": "C:/Users/petbl/supertonic3-local-tts-20260517-r4/supertonic3-local-tts/src"
     }
-  }
+  },
+  "comfyui": {
+    "baseUrl": "http://127.0.0.1:8188",
+    "portableRoot": "C:/Users/petbl/ComfyUI_windows_portable",
+    "startupBatch": "C:/Users/petbl/ComfyUI_windows_portable/run_nvidia_gpu.bat",
+    "extraModelPaths": "C:/Users/petbl/ComfyUI_windows_portable/ComfyUI/extra_model_paths.yaml",
+    "autoStart": false,
+    "startupTimeoutMs": 180000,
+    "promptTimeoutMs": 900000
+  },
+  "ollama": { "baseUrl": "http://127.0.0.1:11434", "visionModel": "gemma4:12b", "requestTimeoutMs": 180000 },
+  "gpuLockPath": "C:/Users/petbl/auto-video/exports/.locks/gpu.lock"
 }

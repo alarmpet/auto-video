@@ -1,0 +1,154 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://auto-video.local/schemas/yadam/render-plan.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "profileId",
+    "approvedArtifactSetHash",
+    "approvalRevisionPath",
+    "storyBible",
+    "scenePlan",
+    "thumbnailPlan",
+    "thumbnailSelection",
+    "audioManifestPath",
+    "audioManifestHash",
+    "audioTimelinePath",
+    "audioTimelineHash",
+    "renderPlanInputPath",
+    "renderPlanInputHash",
+    "measuredAudioSeconds",
+    "acceptedRangeSeconds",
+    "audioTempoFactor",
+    "scenes",
+    "segments",
+    "visualSlots"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "profileId": { "const": "yadam" },
+    "approvedArtifactSetHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "approvalRevisionPath": { "type": "string", "pattern": "^approvals/approval-2-r[0-9]{3}\\.json$" },
+    "storyBible": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["relativePath", "sha256", "schemaVersion", "schemaHash"],
+      "properties": {
+        "relativePath": { "type": "string" },
+        "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "schemaVersion": { "type": "string" },
+        "schemaHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+      }
+    },
+    "scenePlan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["relativePath", "sha256", "schemaVersion", "schemaHash"],
+      "properties": {
+        "relativePath": { "type": "string" },
+        "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "schemaVersion": { "type": "string" },
+        "schemaHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+      }
+    },
+    "thumbnailPlan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["relativePath", "sha256", "schemaVersion", "schemaHash"],
+      "properties": {
+        "relativePath": { "type": "string" },
+        "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "schemaVersion": { "type": "string" },
+        "schemaHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+      }
+    },
+    "thumbnailSelection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["relativePath", "sha256", "copyId"],
+      "properties": {
+        "relativePath": { "type": "string" },
+        "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "copyId": { "type": "string" }
+      }
+    },
+    "audioManifestPath": { "type": "string" },
+    "audioManifestHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "audioTimelinePath": { "type": "string" },
+    "audioTimelineHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "renderPlanInputPath": { "type": "string" },
+    "renderPlanInputHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "measuredAudioSeconds": { "type": "number", "minimum": 0 },
+    "acceptedRangeSeconds": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["minimum", "maximum"],
+      "properties": {
+        "minimum": { "type": "number", "minimum": 0 },
+        "maximum": { "type": "number", "minimum": 0 }
+      }
+    },
+    "audioTempoFactor": { "const": 1 },
+    "scenes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["sceneId", "segmentId", "order", "sourceHash", "ttsNormalizedHash", "ttsOptionsHash", "normalizedWavPath", "normalizedWavHash", "durationSeconds", "startSeconds", "endSeconds"],
+        "properties": {
+          "sceneId": { "type": "string", "pattern": "^scene-[0-9]{4}$" },
+          "segmentId": { "type": "string" },
+          "order": { "type": "integer" },
+          "sourceHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "ttsNormalizedHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "ttsOptionsHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "normalizedWavPath": { "type": "string" },
+          "normalizedWavHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "durationSeconds": { "type": "number", "minimum": 0 },
+          "startSeconds": { "type": "number", "minimum": 0 },
+          "endSeconds": { "type": "number", "minimum": 0 }
+        }
+      }
+    },
+    "segments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["segmentId", "plannedDurationSeconds", "measuredAudioSeconds", "startSeconds", "endSeconds"],
+        "properties": {
+          "segmentId": { "type": "string" },
+          "plannedDurationSeconds": { "type": "number", "minimum": 0 },
+          "measuredAudioSeconds": { "type": "number", "minimum": 0 },
+          "startSeconds": { "type": "number", "minimum": 0 },
+          "endSeconds": { "type": "number", "minimum": 0 }
+        }
+      }
+    },
+    "visualSlots": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["visualSlotId", "visualOrder", "segmentId", "sourceSceneIds", "primarySceneId", "startSeconds", "endSeconds", "durationSeconds", "timingBand", "extendedHold", "holdReason", "purpose", "compiledRequestId", "compiledRequestHash"],
+        "properties": {
+          "visualSlotId": { "type": "string" },
+          "visualOrder": { "type": "integer" },
+          "segmentId": { "type": "string" },
+          "sourceSceneIds": { "type": "array", "items": { "type": "string", "pattern": "^scene-[0-9]{4}$" } },
+          "primarySceneId": { "type": "string", "pattern": "^scene-[0-9]{4}$" },
+          "startSeconds": { "type": "number", "minimum": 0 },
+          "endSeconds": { "type": "number", "minimum": 0 },
+          "durationSeconds": { "type": "number", "minimum": 0 },
+          "timingBand": { "enum": ["intro", "body"] },
+          "extendedHold": { "type": "boolean" },
+          "holdReason": { "oneOf": [{ "type": "null" }, { "enum": ["cta", "short_tail"] }] },
+          "purpose": { "enum": ["intro", "scene"] },
+          "compiledRequestId": { "type": "string" },
+          "compiledRequestHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+        }
+      }
+    }
+  }
+}

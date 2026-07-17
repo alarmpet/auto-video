@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://auto-video.local/schemas/yadam/image-asset-manifest.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "jobId", "approvalRevisionPath", "approvedArtifactSetHash", "referenceSetPath", "referenceSetHash", "renderPlanPath", "renderPlanHash", "assets"],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "jobId": { "type": "string" },
+    "approvalRevisionPath": { "type": "string", "pattern": "^approvals/approval-2-r[0-9]{3}\\.json$" },
+    "approvedArtifactSetHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "referenceSetPath": { "type": "string", "pattern": "^assets/character-references/reference-set-r[0-9]{3}\\.json$" },
+    "referenceSetHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "renderPlanPath": { "const": "render-plan.json" },
+    "renderPlanHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "assets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "assetId",
+          "visualSlotId",
+          "purpose",
+          "path",
+          "sha256",
+          "width",
+          "height",
+          "compiledRequestPath",
+          "compiledRequestHash",
+          "workflowPath",
+          "workflowHash",
+          "checkpointHash",
+          "referenceSetHash",
+          "seed",
+          "generationAttempt",
+          "repairAttemptUsed",
+          "qaPath",
+          "qaHash",
+          "qaStatus"
+        ],
+        "properties": {
+          "assetId": { "type": "string" },
+          "visualSlotId": { "type": "string" },
+          "purpose": { "enum": ["intro", "scene", "thumbnail-background"] },
+          "path": { "type": "string" },
+          "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "width": { "type": "integer" },
+          "height": { "type": "integer" },
+          "compiledRequestPath": { "type": "string" },
+          "compiledRequestHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "workflowPath": { "type": "string" },
+          "workflowHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "checkpointHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "referenceSetHash": { "type": ["string", "null"] },
+          "seed": { "type": "integer" },
+          "generationAttempt": { "type": "integer", "minimum": 1 },
+          "repairAttemptUsed": { "type": "boolean" },
+          "qaPath": { "type": "string" },
+          "qaHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "qaStatus": { "const": "pass" }
+        }
+      }
+    }
+  }
+}

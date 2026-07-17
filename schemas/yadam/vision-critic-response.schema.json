@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://auto-video.local/schemas/yadam/vision-critic-response.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["scores", "flags"],
+  "properties": {
+    "scores": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["contextMatch", "focalCharacterMatch", "eraWardrobeMatch", "colorStyleMatch"],
+      "properties": {
+        "contextMatch": { "type": "integer", "minimum": 0, "maximum": 10 },
+        "focalCharacterMatch": { "type": "integer", "minimum": 0, "maximum": 10 },
+        "eraWardrobeMatch": { "type": "integer", "minimum": 0, "maximum": 10 },
+        "colorStyleMatch": { "type": "integer", "minimum": 0, "maximum": 10 }
+      }
+    },
+    "flags": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requiredFocalSubjectPresent", "unexpectedFocalSubject", "readableText", "watermark", "modernObject", "severeAnatomyDefect", "minorSafetyViolation", "reservedTextRectClear", "faceInTextRect", "criticalObjectInTextRect", "subjectPlacementMatch"],
+      "properties": {
+        "requiredFocalSubjectPresent": { "type": "boolean" },
+        "unexpectedFocalSubject": { "type": "boolean" },
+        "readableText": { "type": "boolean" },
+        "watermark": { "type": "boolean" },
+        "modernObject": { "type": "boolean" },
+        "severeAnatomyDefect": { "type": "boolean" },
+        "minorSafetyViolation": { "type": "boolean" },
+        "reservedTextRectClear": { "type": ["boolean", "null"] },
+        "faceInTextRect": { "type": ["boolean", "null"] },
+        "criticalObjectInTextRect": { "type": ["boolean", "null"] },
+        "subjectPlacementMatch": { "type": ["boolean", "null"] }
+      }
+    }
+  }
+}

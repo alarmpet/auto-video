@@ -1,0 +1,144 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://auto-video.local/schemas/yadam/thumbnail-qa.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "status",
+    "copyId",
+    "exactText",
+    "lines",
+    "lineHashes",
+    "lineCount",
+    "layout",
+    "canvas",
+    "normalizedTextRect",
+    "pixelTextRect",
+    "protectedPixelRects",
+    "edgeMargins",
+    "typography",
+    "background",
+    "textLayerSha256"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "status": { "enum": ["pass", "needs_review"] },
+    "copyId": { "type": "string" },
+    "exactText": { "type": "string" },
+    "lines": { "type": "array", "items": { "type": "string" } },
+    "lineHashes": { "type": "array", "items": { "type": "string", "pattern": "^[0-9a-f]{64}$" } },
+    "lineCount": { "type": "integer" },
+    "layout": { "enum": ["left-panel-4", "right-panel-4", "bottom-band-2"] },
+    "canvas": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["width", "height"],
+      "properties": {
+        "width": { "const": 1280 },
+        "height": { "const": 720 }
+      }
+    },
+    "normalizedTextRect": {
+      "type": "array",
+      "prefixItems": [
+        { "type": "number", "minimum": 0, "maximum": 1 },
+        { "type": "number", "minimum": 0, "maximum": 1 },
+        { "type": "number", "exclusiveMinimum": 0, "maximum": 1 },
+        { "type": "number", "exclusiveMinimum": 0, "maximum": 1 }
+      ],
+      "minItems": 4,
+      "maxItems": 4
+    },
+    "pixelTextRect": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y", "width", "height"],
+      "properties": {
+        "x": { "type": "integer", "minimum": 0 },
+        "y": { "type": "integer", "minimum": 0 },
+        "width": { "type": "integer", "minimum": 1 },
+        "height": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "protectedPixelRects": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "kind", "x", "y", "width", "height"],
+        "properties": {
+          "id": { "type": "string" },
+          "kind": { "enum": ["face", "hand", "critical-object"] },
+          "x": { "type": "integer", "minimum": 0 },
+          "y": { "type": "integer", "minimum": 0 },
+          "width": { "type": "integer", "minimum": 1 },
+          "height": { "type": "integer", "minimum": 1 }
+        }
+      }
+    },
+    "edgeMargins": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["left", "top", "right", "bottom", "minimumRatio"],
+      "properties": {
+        "left": { "type": "number" },
+        "top": { "type": "number" },
+        "right": { "type": "number" },
+        "bottom": { "type": "number" },
+        "minimumRatio": { "const": 0.04 }
+      }
+    },
+    "typography": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fontPath", "fontSha256", "fallbackPath", "fallbackSha256", "fontSize", "minFontSize", "maxFontSize", "lineSpacing", "alignment", "fill", "outline", "shadow"],
+      "properties": {
+        "fontPath": { "type": "string" },
+        "fontSha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "fallbackPath": { "type": "string" },
+        "fallbackSha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "fontSize": { "type": "integer" },
+        "minFontSize": { "type": "integer" },
+        "maxFontSize": { "type": "integer" },
+        "lineSpacing": { "type": "number" },
+        "alignment": { "enum": ["left", "center", "right"] },
+        "fill": { "type": "string" },
+        "outline": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["color", "width"],
+          "properties": {
+            "color": { "type": "string" },
+            "width": { "type": "number" }
+          }
+        },
+        "shadow": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["color", "x", "y", "blur"],
+          "properties": {
+            "color": { "type": "string" },
+            "x": { "type": "number" },
+            "y": { "type": "number" },
+            "blur": { "type": "number" }
+          }
+        }
+      }
+    },
+    "background": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "qaPath", "qaSha256"],
+      "properties": {
+        "path": { "type": "string" },
+        "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "qaPath": { "type": "string" },
+        "qaSha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+      }
+    },
+    "textLayerSha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "finalPath": { "type": "string" },
+    "finalSha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+  }
+}

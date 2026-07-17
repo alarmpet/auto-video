@@ -27,17 +27,23 @@ export async function validateSchema(schemaPath, value) {
     }
   }
 
-  let validate = compiledCache.get(absPath);
-  if (!validate) {
-    let schemaJson;
-    try {
-      schemaJson = await readJson(absPath);
-    } catch (err) {
-      throw new Error(`failed to load schema at ${absPath}: ${err.message}`, { cause: err });
-    }
-    validate = ajv.compile(schemaJson);
-    compiledCache.set(absPath, validate);
+  let validatePromise = compiledCache.get(absPath);
+  if (!validatePromise) {
+    validatePromise = (async () => {
+      let schemaJson;
+      try {
+        schemaJson = await readJson(absPath);
+      } catch (err) {
+        throw new Error(`failed to load schema at ${absPath}: ${err.message}`, { cause: err });
+      }
+      if (schemaJson.$id && ajv.getSchema(schemaJson.$id)) {
+        return ajv.getSchema(schemaJson.$id);
+      }
+      return ajv.compile(schemaJson);
+    })();
+    compiledCache.set(absPath, validatePromise);
   }
+  const validate = await validatePromise;
 
   const valid = validate(value);
   if (!valid) {

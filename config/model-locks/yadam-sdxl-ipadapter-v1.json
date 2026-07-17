@@ -1,0 +1,61 @@
+{
+  "schemaVersion": "1.0.0",
+  "stackId": "yadam-sdxl-ipadapter-v1",
+  "checkpoint": {
+    "sourceKind": "existing-local",
+    "filename": "sd_xl_base_1.0.safetensors",
+    "path": "C:/Users/petbl/hermes-studio/hermes-local/models/checkpoints/sd_xl_base_1.0.safetensors",
+    "sizeBytes": 6938078334,
+    "sha256": "31e35c80fc4829d14f90153f4c74cd59c90b779f6afe05a74cd6120b893f7e5b"
+  },
+  "customNode": {
+    "id": "comfyorg-comfyui-ipadapter",
+    "gitUrl": "https://github.com/comfyorg/comfyui-ipadapter.git",
+    "commitUrl": "https://github.com/comfyorg/comfyui-ipadapter/commit/b188a6cb39b512a9c6da7235b880af42c78ccd0d",
+    "commit": "b188a6cb39b512a9c6da7235b880af42c78ccd0d",
+    "license": "GPL-3.0",
+    "targetPath": "C:/Users/petbl/ComfyUI_windows_portable/ComfyUI/custom_nodes/comfyui-ipadapter"
+  },
+  "models": {
+    "clipVision": {
+      "repo": "h94/IP-Adapter",
+      "repoCommit": "018e402774aeeddd60609b4ecdb7e298259dc729",
+      "license": "Apache-2.0",
+      "url": "https://huggingface.co/h94/IP-Adapter/resolve/018e402774aeeddd60609b4ecdb7e298259dc729/models/image_encoder/model.safetensors?download=true",
+      "filename": "CLIP-ViT-H-14-laion2B-s32B-b79K.safetensors",
+      "targetPath": "C:/Users/petbl/ComfyUI_windows_portable/ComfyUI/models/clip_vision/CLIP-ViT-H-14-laion2B-s32B-b79K.safetensors",
+      "sizeBytes": 2528373448,
+      "sha256": "6ca9667da1ca9e0b0f75e46bb030f7e011f44f86cbfb8d5a36590fcd7507b030"
+    },
+    "ipAdapter": {
+      "repo": "h94/IP-Adapter",
+      "repoCommit": "018e402774aeeddd60609b4ecdb7e298259dc729",
+      "license": "Apache-2.0",
+      "url": "https://huggingface.co/h94/IP-Adapter/resolve/018e402774aeeddd60609b4ecdb7e298259dc729/sdxl_models/ip-adapter-plus-face_sdxl_vit-h.safetensors?download=true",
+      "filename": "ip-adapter-plus-face_sdxl_vit-h.safetensors",
+      "targetPath": "C:/Users/petbl/ComfyUI_windows_portable/ComfyUI/models/ipadapter/ip-adapter-plus-face_sdxl_vit-h.safetensors",
+      "sizeBytes": 847517512,
+      "sha256": "677ad8860204f7d0bfba12d29e6c31ded9beefdf3e4bbd102518357d31a292c1"
+    }
+  },
+  "ollamaVision": {
+    "model": "gemma4:12b",
+    "digest": "4eb23ef187e2c5462566d6a1d3bbbc2f1346d0b4327cbb66d58fffbcc9b2b05c",
+    "sizeBytes": 7556508396,
+    "quantization": "Q4_K_M",
+    "capabilities": ["vision"]
+  },
+  "fonts": {
+    "bold": { "path": "C:/Windows/Fonts/malgunbd.ttf", "sizeBytes": 12600392, "sha256": "e8cbc0b2afcc14fb45dfb6086d5102c0b23a96e7b6e708f3122acde1b86c9082" },
+    "regular": { "path": "C:/Windows/Fonts/malgun.ttf", "sizeBytes": 13459196, "sha256": "7a183cf1c6c56b9609fcc16eda8b5229fbc11758a21e669ec00343239b02192f" }
+  },
+  "legacyMigration": {
+    "extraModelPaths": "C:/Users/petbl/ComfyUI_windows_portable/ComfyUI/extra_model_paths.yaml",
+    "acceptedInputSha256": "e5ed7e0dfd928d82798593706ca97825f02604bc6b1a037ef99177b630a1888c",
+    "legacyRoot": "C:/Users/petbl/hermes_models",
+    "legacyLoras": [
+      { "filename": "stickfigures_lora.safetensors", "sizeBytes": 228462156, "sha256": "76232996877d29c8433fce10a4fb8a8bf7c9aedb4cef7fab3ba01ca5d074e222" },
+      { "filename": "stickman_lora.safetensors", "sizeBytes": 228465612, "sha256": "4907bfe1e2b7af0bd7ead7811e6747917bd3ed7a48e606d29176a0a99f85c711" }
+    ]
+  }
+}

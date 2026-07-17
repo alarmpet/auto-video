@@ -1,0 +1,118 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://auto-video.local/schemas/yadam/visual-asset-qa.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "assetId",
+    "visualSlotId",
+    "purpose",
+    "attempt",
+    "compiledRequestHash",
+    "asset",
+    "deterministic",
+    "critic",
+    "failedAxes",
+    "repairAttemptUsed",
+    "status"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "assetId": { "type": "string" },
+    "visualSlotId": { "type": "string" },
+    "purpose": { "enum": ["reference", "intro", "scene", "thumbnail-background"] },
+    "attempt": { "type": "integer", "minimum": 1 },
+    "compiledRequestHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "asset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "width", "height"],
+      "properties": {
+        "path": { "type": "string" },
+        "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "width": { "type": "integer" },
+        "height": { "type": "integer" }
+      }
+    },
+    "deterministic": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "format", "sizeBytes", "meanLuminance", "luminanceStdDev", "visiblePixelRatio", "colorPixelRatio", "failures"],
+      "properties": {
+        "status": { "enum": ["pass", "fail"] },
+        "format": { "type": "string" },
+        "sizeBytes": { "type": "integer", "minimum": 0 },
+        "meanLuminance": { "type": "number" },
+        "luminanceStdDev": { "type": "number" },
+        "visiblePixelRatio": { "type": "number" },
+        "colorPixelRatio": { "type": "number" },
+        "failures": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "critic": {
+      "type": "object",
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "required": ["status", "reason"],
+          "properties": {
+            "status": { "const": "not_run" },
+            "reason": { "const": "deterministic_failed" }
+          }
+        },
+        {
+          "additionalProperties": false,
+          "required": ["status", "model", "responseHash", "scores", "flags"],
+          "properties": {
+            "status": { "enum": ["pass", "fail"] },
+            "model": { "const": "gemma4:12b" },
+            "responseHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+            "scores": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["contextMatch", "focalCharacterMatch", "eraWardrobeMatch", "colorStyleMatch"],
+              "properties": {
+                "contextMatch": { "type": "integer", "minimum": 0, "maximum": 10 },
+                "focalCharacterMatch": { "type": "integer", "minimum": 0, "maximum": 10 },
+                "eraWardrobeMatch": { "type": "integer", "minimum": 0, "maximum": 10 },
+                "colorStyleMatch": { "type": "integer", "minimum": 0, "maximum": 10 }
+              }
+            },
+            "flags": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["requiredFocalSubjectPresent", "unexpectedFocalSubject", "readableText", "watermark", "modernObject", "severeAnatomyDefect", "minorSafetyViolation", "reservedTextRectClear", "faceInTextRect", "criticalObjectInTextRect", "subjectPlacementMatch"],
+              "properties": {
+                "requiredFocalSubjectPresent": { "type": "boolean" },
+                "unexpectedFocalSubject": { "type": "boolean" },
+                "readableText": { "type": "boolean" },
+                "watermark": { "type": "boolean" },
+                "modernObject": { "type": "boolean" },
+                "severeAnatomyDefect": { "type": "boolean" },
+                "minorSafetyViolation": { "type": "boolean" },
+                "reservedTextRectClear": { "type": ["boolean", "null"] },
+                "faceInTextRect": { "type": ["boolean", "null"] },
+                "criticalObjectInTextRect": { "type": ["boolean", "null"] },
+                "subjectPlacementMatch": { "type": ["boolean", "null"] }
+              }
+            }
+          }
+        },
+        {
+          "additionalProperties": false,
+          "required": ["status", "model", "responseHash", "errorCode"],
+          "properties": {
+            "status": { "enum": ["unavailable", "parse_error"] },
+            "model": { "const": "gemma4:12b" },
+            "responseHash": { "type": ["string", "null"], "pattern": "^[0-9a-f]{64}$" },
+            "errorCode": { "type": "string" }
+          }
+        }
+      ]
+    },
+    "failedAxes": { "type": "array", "items": { "type": "string" } },
+    "repairAttemptUsed": { "type": "boolean" },
+    "status": { "enum": ["pass", "needs_review"] }
+  }
+}

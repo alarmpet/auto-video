@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "status", "referenceSetPath", "referenceSetHash", "approvalRevisionPath", "approvalRevisionHash"],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "status": { "enum": ["provisional", "approved"] },
+    "referenceSetPath": { "type": "string", "pattern": "^assets/character-references/reference-set-r[0-9]{3}\\.json$" },
+    "referenceSetHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "approvalRevisionPath": { "oneOf": [{ "type": "null" }, { "type": "string", "pattern": "^approvals/approval-2-r[0-9]{3}\\.json$" }] },
+    "approvalRevisionHash": { "oneOf": [{ "type": "null" }, { "type": "string", "pattern": "^[0-9a-f]{64}$" }] }
+  }
+}

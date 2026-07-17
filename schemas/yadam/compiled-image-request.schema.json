@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://auto-video.local/schemas/yadam/compiled-image-request.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "jobId", "assetId", "mode", "visualSlotId", "sourceSceneIds", "primarySceneId", "sourceScenes", "purpose", "identity", "story", "composition", "positivePrompt", "negativePrompt", "conditioning", "render", "provenance", "idempotencyKey"],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "jobId": { "type": "string", "minLength": 1 },
+    "assetId": { "type": "string", "pattern": "^[a-zA-Z0-9-]+$" },
+    "mode": { "enum": ["preview", "production"] },
+    "visualSlotId": { "type": "string", "minLength": 1 },
+    "sourceSceneIds": { "type": "array", "uniqueItems": true, "items": { "type": "string", "pattern": "^(scene-[0-9]{4}|reference-[a-zA-Z0-9-]+)$" } },
+    "primarySceneId": { "oneOf": [{ "type": "null" }, { "type": "string", "pattern": "^scene-[0-9]{4}$" }] },
+    "sourceScenes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["sceneId", "sourceHash"],
+        "properties": {
+          "sceneId": { "type": "string", "pattern": "^scene-[0-9]{4}$" },
+          "sourceHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+        }
+      }
+    },
+    "purpose": { "enum": ["reference", "scene", "intro", "thumbnail-background"] },
+    "identity": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["characterId", "variantId", "referenceStatus", "referencePath", "referenceSha256", "appearanceAnchors", "wardrobeAnchors"],
+          "properties": {
+            "characterId": { "type": "string", "minLength": 1 },
+            "variantId": { "type": "string", "minLength": 1 },
+            "referenceStatus": { "enum": ["none", "provisional", "approved"] },
+            "referencePath": { "oneOf": [{ "type": "null" }, { "type": "string", "minLength": 1 }] },
+            "referenceSha256": { "oneOf": [{ "type": "null" }, { "type": "string", "pattern": "^[0-9a-f]{64}$" }] },
+            "appearanceAnchors": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+            "wardrobeAnchors": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "minLength": 1 } }
+          }
+        }
+      ]
+    },
+    "story": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["subject", "action", "emotion", "location", "era", "wardrobe", "props"],
+      "properties": {
+        "subject": { "type": "string", "minLength": 1 },
+        "action": { "type": "string", "minLength": 1 },
+        "emotion": { "type": "string", "minLength": 1 },
+        "location": { "type": "string", "minLength": 1 },
+        "era": { "const": "Joseon-era Korea" },
+        "wardrobe": { "type": "array", "items": { "type": "string" } },
+        "props": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "composition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["shotSize", "cameraAngle", "focalPosition", "focalHeadcount", "gaze", "reservedTextRect"],
+      "properties": {
+        "shotSize": { "enum": ["close-up", "medium", "wide", "establishing"] },
+        "cameraAngle": { "enum": ["eye-level", "low", "high", "three-quarter"] },
+        "focalPosition": { "enum": ["left", "center", "right", "background"] },
+        "focalHeadcount": { "type": "integer", "minimum": 0, "maximum": 1 },
+        "gaze": { "enum": ["camera", "left", "right", "down", "away"] },
+        "reservedTextRect": { "oneOf": [{ "type": "null" }, { "type": "array", "prefixItems": [{ "type": "number", "minimum": 0, "maximum": 1 }, { "type": "number", "minimum": 0, "maximum": 1 }, { "type": "number", "exclusiveMinimum": 0, "maximum": 1 }, { "type": "number", "exclusiveMinimum": 0, "maximum": 1 }], "minItems": 4, "maxItems": 4 }] }
+      }
+    },
+    "positivePrompt": { "type": "string", "minLength": 40 },
+    "negativePrompt": { "type": "string", "minLength": 40 },
+    "conditioning": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["method", "preset", "weightType", "referenceSha256", "weight", "start", "end"],
+      "properties": {
+        "method": { "enum": ["none", "sdxl-ipadapter-plus-face"] },
+        "preset": { "oneOf": [{ "type": "null" }, { "const": "PLUS FACE (portraits)" }] },
+        "weightType": { "oneOf": [{ "type": "null" }, { "const": "standard" }] },
+        "referenceSha256": { "oneOf": [{ "type": "null" }, { "type": "string", "pattern": "^[0-9a-f]{64}$" }] },
+        "weight": { "type": "number", "minimum": 0, "maximum": 1.5 },
+        "start": { "type": "number", "minimum": 0, "maximum": 1 },
+        "end": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "render": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["width", "height", "seed", "steps", "cfg", "sampler", "scheduler"],
+      "properties": {
+        "width": { "enum": [768, 1024, 1280] },
+        "height": { "enum": [576, 720, 1024] },
+        "seed": { "type": "integer", "minimum": 0, "maximum": 281474976710655 },
+        "steps": { "enum": [24, 28] },
+        "cfg": { "const": 6 },
+        "sampler": { "const": "dpmpp_2m" },
+        "scheduler": { "const": "karras" }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["compilerVersion", "schemaVersion", "styleVersion", "workflowHash", "checkpointHash", "clipVisionHash", "ipAdapterHash", "loraHash"],
+      "properties": {
+        "compilerVersion": { "type": "string", "minLength": 1 },
+        "schemaVersion": { "const": "1.0.0" },
+        "styleVersion": { "type": "string", "minLength": 1 },
+        "workflowHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "checkpointHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "clipVisionHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "ipAdapterHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "loraHash": { "type": "null" }
+      }
+    },
+    "idempotencyKey": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+  }
+}

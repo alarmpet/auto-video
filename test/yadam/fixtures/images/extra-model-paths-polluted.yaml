@@ -1,0 +1,8 @@
+hermes:
+  base_path: C:/Users/petbl/hermes_models
+  checkpoints: .
+  loras: .
+hermes_local:
+  base_path: C:/Users/petbl/hermes-studio/hermes-local/models
+  checkpoints: checkpoints
+  loras: loras

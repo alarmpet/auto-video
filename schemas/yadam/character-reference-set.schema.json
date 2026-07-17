@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://auto-video.local/schemas/yadam/character-reference-set.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "jobId", "revision", "createdAt", "semanticHash", "references"],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "jobId": { "type": "string" },
+    "revision": { "type": "integer", "minimum": 1 },
+    "createdAt": { "type": "string" },
+    "semanticHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "references": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["characterId", "variantId", "appearanceAnchors", "wardrobeAnchors", "primaryPath", "primarySha256", "width", "height", "seed", "checkpointHash", "workflowHash", "compiledRequestHash", "derived"],
+        "properties": {
+          "characterId": { "type": "string" },
+          "variantId": { "type": "string" },
+          "appearanceAnchors": { "type": "array", "items": { "type": "string" } },
+          "wardrobeAnchors": { "type": "array", "items": { "type": "string" } },
+          "primaryPath": { "type": "string" },
+          "primarySha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "width": { "type": "integer" },
+          "height": { "type": "integer" },
+          "seed": { "type": "integer" },
+          "checkpointHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "workflowHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "compiledRequestHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "derived": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["variantId", "path", "sha256", "width", "height", "seed", "checkpointHash", "workflowHash", "compiledRequestHash", "primaryDependencyHash"],
+              "properties": {
+                "variantId": { "type": "string" },
+                "path": { "type": "string" },
+                "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+                "width": { "type": "integer" },
+                "height": { "type": "integer" },
+                "seed": { "type": "integer" },
+                "checkpointHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+                "workflowHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+                "compiledRequestHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+                "primaryDependencyHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

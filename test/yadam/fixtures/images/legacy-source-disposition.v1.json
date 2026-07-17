@@ -1,0 +1,81 @@
+{
+  "schemaVersion": "1.0.0",
+  "sourceDispositionVersion": "2026-07-16",
+  "sources": [
+    {
+      "path": "module/시스템프롬프트_Sonnet.txt",
+      "sha256": "6cad802444c51daf009e9d47de7a140224d01cb4097a3b0bf87cb590a85d4ab9",
+      "acceptedRules": [
+        "retain source grounding",
+        "spoiler discipline",
+        "period-safe subject/action/location separation",
+        "reference continuity"
+      ],
+      "adaptedRules": [
+        "adapt motion-language to still-image composition",
+        "one-focal-conditioned-face rule"
+      ],
+      "rejectedRules": [
+        "Sonnet/Grok/video-provider coupling",
+        "free-form orchestration"
+      ],
+      "implementationOwners": [
+        "yadam-image-developer"
+      ],
+      "downstreamTests": [
+        "visual-source-disposition-test"
+      ]
+    },
+    {
+      "path": "module/prompt_v5.2_sonnet.md",
+      "sha256": "af2b889f671223e71c002c440387dd23ac7f4d56d89bdc465ba4ffe15226b172",
+      "acceptedRules": [
+        "retain Joseon era/location/cast/wardrobe/headcount evidence",
+        "anonymous-extra specificity",
+        "negative text",
+        "modern-object gates"
+      ],
+      "adaptedRules": [
+        "adapt chapter count",
+        "prompt length",
+        "G1–G25 overlaps into the closed compiled-request schema, visual-slot plan and local validators"
+      ],
+      "rejectedRules": [
+        "Google Flow/Nano Banana",
+        "present_files",
+        "embedded Python",
+        "model-chosen counts"
+      ],
+      "implementationOwners": [
+        "yadam-image-developer"
+      ],
+      "downstreamTests": [
+        "visual-source-disposition-test"
+      ]
+    },
+    {
+      "path": "module/썸네일 프롬프트 (opus) 260601.md",
+      "sha256": "fe6b08667f91aa17cd7ca29a259c16e2edf927faf6db2e29cdc9f892a1fd0e25",
+      "acceptedRules": [
+        "retain four provisional copy candidates",
+        "copy hierarchy",
+        "background subject/composition",
+        "protected-area principles"
+      ],
+      "adaptedRules": [
+        "adapt raster generation to a text-free background plus deterministic Sharp Korean composition and guide overlay"
+      ],
+      "rejectedRules": [
+        "Opus coupling",
+        "model-rendered text",
+        "mandatory photorealistic/cinematic styling"
+      ],
+      "implementationOwners": [
+        "yadam-image-developer"
+      ],
+      "downstreamTests": [
+        "visual-source-disposition-test"
+      ]
+    }
+  ]
+}

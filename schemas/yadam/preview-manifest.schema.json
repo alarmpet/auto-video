@@ -1,0 +1,197 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://auto-video.local/schemas/yadam/preview-manifest.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "jobId",
+    "createdAt",
+    "inputs",
+    "characterReferenceSet",
+    "styleProfile",
+    "representativePreviews",
+    "thumbnailPreview",
+    "thumbnailGuide",
+    "refreshEvidence"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "jobId": { "type": "string" },
+    "createdAt": { "type": "string" },
+    "inputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["storyBible", "scenePlan", "thumbnailPlan", "thumbnailSelection"],
+      "properties": {
+        "storyBible": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["relativePath", "sha256", "schemaVersion", "schemaHash"],
+          "properties": {
+            "relativePath": { "type": "string" },
+            "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+            "schemaVersion": { "type": "string" },
+            "schemaHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+          }
+        },
+        "scenePlan": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["relativePath", "sha256", "schemaVersion", "schemaHash"],
+          "properties": {
+            "relativePath": { "type": "string" },
+            "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+            "schemaVersion": { "type": "string" },
+            "schemaHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+          }
+        },
+        "thumbnailPlan": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["relativePath", "sha256", "schemaVersion", "schemaHash"],
+          "properties": {
+            "relativePath": { "type": "string" },
+            "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+            "schemaVersion": { "type": "string" },
+            "schemaHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+          }
+        },
+        "thumbnailSelection": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["relativePath", "sha256", "copyId"],
+          "properties": {
+            "relativePath": { "type": "string" },
+            "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+            "copyId": { "type": "string" }
+          }
+        }
+      }
+    },
+    "characterReferenceSet": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["artifactId", "relativePath", "sha256", "status", "dependencyHash"],
+      "properties": {
+        "artifactId": { "const": "character-reference-set-current" },
+        "relativePath": { "type": "string" },
+        "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "status": { "const": "provisional" },
+        "dependencyHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+      }
+    },
+    "styleProfile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["artifactId", "relativePath", "sha256", "dependencyHash"],
+      "properties": {
+        "artifactId": { "type": "string" },
+        "relativePath": { "type": "string" },
+        "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "dependencyHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+      }
+    },
+    "representativePreviews": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["role", "artifactId", "visualSlotId", "sourceSceneIds", "sourceSceneHashes", "relativePath", "sha256", "qaPath", "qaSha256", "dependencyHash"],
+        "properties": {
+          "role": { "enum": ["intro", "body", "climax"] },
+          "artifactId": { "type": "string" },
+          "visualSlotId": { "type": "string" },
+          "sourceSceneIds": { "type": "array", "items": { "type": "string" } },
+          "sourceSceneHashes": { "type": "array", "items": { "type": "string", "pattern": "^[0-9a-f]{64}$" } },
+          "relativePath": { "type": "string" },
+          "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "qaPath": { "type": "string" },
+          "qaSha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "dependencyHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+        }
+      }
+    },
+    "thumbnailPreview": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["artifactId", "relativePath", "sha256", "qaPath", "qaSha256", "dependencyHash"],
+      "properties": {
+        "artifactId": { "type": "string" },
+        "relativePath": { "type": "string" },
+        "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "qaPath": { "type": "string" },
+        "qaSha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "dependencyHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+      }
+    },
+    "thumbnailGuide": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["artifactId", "relativePath", "sha256", "dependencyHash"],
+      "properties": {
+        "artifactId": { "const": "thumbnail-reserved-guide" },
+        "relativePath": { "const": "previews/thumbnail-reserved-guide.png" },
+        "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "dependencyHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+      }
+    },
+    "refreshEvidence": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "refreshInputHash",
+            "repairReportHash",
+            "priorPreviewManifestPath",
+            "priorPreviewManifestHash",
+            "priorScenePlanHash",
+            "repairedScenePlanHash",
+            "requestedChangedSceneIds",
+            "changedSceneProjectionHash",
+            "referenceSetHash",
+            "styleProfileHash",
+            "profileHash",
+            "modelLockHash",
+            "referenceWorkflowHash",
+            "conditionedWorkflowHash",
+            "compilerVersionHash",
+            "imageQaPolicyHash",
+            "thumbnailCompositorPolicyHash",
+            "comfyProviderContractHash",
+            "affectedRoles",
+            "unaffectedRoles",
+            "refreshedAt"
+          ],
+          "properties": {
+            "refreshInputHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+            "repairReportHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+            "priorPreviewManifestPath": { "type": "string", "pattern": "^previews/preview-manifest-prior-[0-9a-f]{64}\\.json$" },
+            "priorPreviewManifestHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+            "priorScenePlanHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+            "repairedScenePlanHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+            "requestedChangedSceneIds": { "type": "array", "items": { "type": "string" } },
+            "changedSceneProjectionHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+            "referenceSetHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+            "styleProfileHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+            "profileHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+            "modelLockHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+            "referenceWorkflowHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+            "conditionedWorkflowHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+            "compilerVersionHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+            "imageQaPolicyHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+            "thumbnailCompositorPolicyHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+            "comfyProviderContractHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+            "affectedRoles": { "type": "array", "items": { "type": "string" } },
+            "unaffectedRoles": { "type": "array", "items": { "type": "string" } },
+            "refreshedAt": { "type": "string" }
+          }
+        }
+      ]
+    }
+  }
+}

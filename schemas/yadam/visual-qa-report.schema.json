@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://auto-video.local/schemas/yadam/visual-qa-report.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "jobId",
+    "approvalRevisionPath",
+    "approvedArtifactSetHash",
+    "renderPlanHash",
+    "referenceSetHash",
+    "status",
+    "totalAssets",
+    "passedAssets",
+    "needsReviewAssets",
+    "assets"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "jobId": { "type": "string" },
+    "approvalRevisionPath": { "type": "string" },
+    "approvedArtifactSetHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "renderPlanHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "referenceSetHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "status": { "enum": ["pass", "needs_review"] },
+    "totalAssets": { "type": "integer" },
+    "passedAssets": { "type": "integer" },
+    "needsReviewAssets": { "type": "integer" },
+    "assets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["assetId", "visualSlotId", "qaPath", "qaHash", "status", "failedAxes"],
+        "properties": {
+          "assetId": { "type": "string" },
+          "visualSlotId": { "type": "string" },
+          "qaPath": { "type": "string" },
+          "qaHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "status": { "enum": ["pass", "needs_review"] },
+          "failedAxes": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    }
+  }
+}

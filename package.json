@@ -5,13 +5,19 @@
   "type": "module",
   "engines": { "node": ">=22.16.0" },
   "scripts": {
-    "test:yadam:node": "node --test test/yadam/foundation.test.mjs test/yadam/codex-runner.test.mjs test/yadam/cli.test.mjs test/yadam/tts-contract.test.mjs test/yadam/supertonic-http.test.mjs test/yadam/supertonic-cli.test.mjs test/yadam/audio-normalization.test.mjs test/yadam/tts-resume.test.mjs test/yadam/audio-timeline.test.mjs test/yadam/duration-repair-tts.test.mjs",
-    "test:yadam:script": "node scripts/run-yadam-script-tests.mjs",
     "test:yadam": "npm run test:yadam:node && npm run test:yadam:script",
-    "auto-video": "node scripts/auto-video-pipeline.mjs"
+    "test:yadam:node": "node --test \"test/yadam/**/*.test.mjs\"",
+    "test:yadam:script": "node scripts/run-yadam-script-tests.mjs",
+    "test:yadam:image": "node --test test/yadam/visual-source-disposition.test.mjs test/yadam/image-config.test.mjs test/yadam/image-workflow.test.mjs test/yadam/image-provider.test.mjs test/yadam/resource-lock.test.mjs test/yadam/image-qa.test.mjs test/yadam/thumbnail.test.mjs test/yadam/image-service.test.mjs",
+    "auto-video": "node scripts/auto-video-pipeline.mjs",
+    "yadam:image-host": "node scripts/yadam-image-host.mjs",
+    "yadam:image-stage": "node scripts/yadam-image-stage.mjs",
+    "yadam:image-smoke": "node scripts/yadam-image-smoke.mjs"
   },
   "dependencies": {
     "ajv": "8.20.0",
-    "json-canonicalize": "2.0.0"
+    "json-canonicalize": "2.0.0",
+    "sharp": "0.35.3",
+    "yaml": "2.9.0"
   }
 }

@@ -41,6 +41,7 @@
     }
   },
   "visual": {
+    "stackId": "yadam-sdxl-ipadapter-v1",
     "styleId": "yadam-color-manhwa-v1",
     "sceneWidth": 1024,
     "sceneHeight": 576,
@@ -48,8 +49,18 @@
     "referenceHeight": 1024,
     "thumbnailWidth": 1280,
     "thumbnailHeight": 720,
+    "focalConditionedCharacters": 1,
+    "workflows": { "unconditioned": "assets/workflows/yadam_sdxl_reference_v1.json", "conditioned": "assets/workflows/yadam_sdxl_ipadapter_v1.json" },
+    "sampler": "dpmpp_2m",
+    "scheduler": "karras",
+    "cfg": 6,
+    "referenceSteps": 28,
+    "sceneSteps": 24,
+    "ipAdapter": { "preset": "PLUS FACE (portraits)", "weightType": "standard", "weight": 0.8, "start": 0, "end": 0.85 },
+    "intro": { "endSeconds": 60, "minSlotSeconds": 5, "maxSlotSeconds": 7, "targetSlotSeconds": 6 },
+    "body": { "minSlotSeconds": 20, "maxSlotSeconds": 40, "targetSlotSeconds": 30 },
     "maxSlots": 260,
-    "focalConditionedCharacters": 1
+    "qa": { "contextMin": 7, "identityMin": 6, "eraWardrobeMin": 7, "colorStyleMin": 7, "sourceColorPixelRatioMin": 0.1, "repairAttempts": 1 }
   },
   "video": {
     "width": 1920,
