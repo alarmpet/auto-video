@@ -215,8 +215,9 @@ export async function runCodexStage({ jobDir, stageId, prompt, schemaPath, input
   }
 
   // Verify payload matches job, stage, inputHash
-  if (payload.jobId !== request.jobId || payload.stageId !== stageId || payload.inputHash !== inputHash) {
-    console.error(`MISMATCH DETAIL: payload.jobId=${payload.jobId} request.jobId=${request.jobId}; payload.stageId=${payload.stageId} stageId=${stageId}; payload.inputHash=${payload.inputHash} inputHash=${inputHash}`);
+  const expectedBaseStageId = stageId.split(".repair-")[0];
+  if (payload.jobId !== request.jobId || (payload.stageId !== stageId && payload.stageId !== expectedBaseStageId) || payload.inputHash !== inputHash) {
+    console.error(`MISMATCH DETAIL: payload.jobId=${payload.jobId} request.jobId=${request.jobId}; payload.stageId=${payload.stageId} stageId=${stageId} (or ${expectedBaseStageId}); payload.inputHash=${payload.inputHash} inputHash=${inputHash}`);
     const err = new Error("Codex payload mismatch on jobId, stageId, or inputHash");
     err.code = "codex_payload_mismatch";
     throw err;
