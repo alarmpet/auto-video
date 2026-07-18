@@ -125,11 +125,9 @@ export function createMasterOrchestrator({ services, renderReviewBundle }) {
     const profileHash = sha256Bytes(Buffer.from("yadam"));
 
     if (stageId === "concept_options") {
-      const reqPath = join(jobDir, "request.json");
-      const inputHash = existsSync(reqPath) ? sha256Bytes(readFileSync(reqPath)) : row.inputHash;
       const optArt = manifest.artifacts?.find(a => a.logicalRole === "yadam.concept.options" && a.gateStatus === "pass");
       const outputHash = optArt ? optArt.sha256 : row.outputHash;
-      return { inputHash, outputHash };
+      return { inputHash: row.inputHash, outputHash };
     }
 
     if (stageId === "concept_selection") {
