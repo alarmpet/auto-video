@@ -1,5 +1,5 @@
 // scripts/lib/yadam/segment-drafter.mjs
-import { join, dirname } from "node:path";
+import { join, dirname, resolve } from "node:path";
 import { readFile, readdir } from "node:fs/promises";
 import { loadJob } from "../pipeline/job-store.mjs";
 import { writeCanonicalJson } from "../pipeline/atomic-store.mjs";
@@ -270,9 +270,4 @@ export async function draftNextSegment({ jobDir }) {
     sha256: segmentHash,
     remainingSegments
   };
-}
-
-// Helper mock resolve relative to process
-function resolve(path) {
-  return join(process.cwd(), path);
 }

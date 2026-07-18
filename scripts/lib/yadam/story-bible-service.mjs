@@ -1,5 +1,5 @@
 // scripts/lib/yadam/story-bible-service.mjs
-import { join, dirname } from "node:path";
+import { join, dirname, resolve } from "node:path";
 import { readFile } from "node:fs/promises";
 import { loadJob } from "../pipeline/job-store.mjs";
 import { writeCanonicalJson } from "../pipeline/atomic-store.mjs";
@@ -215,9 +215,4 @@ export async function buildStoryBible({ jobDir }) {
     sha256: storyBibleHash,
     semanticContractHash: expectedSemanticContractHash
   };
-}
-
-// Helper to mock resolve relative to process
-function resolve(path) {
-  return join(process.cwd(), path);
 }
