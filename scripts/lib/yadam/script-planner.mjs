@@ -5,7 +5,7 @@ import { loadJob } from "../pipeline/job-store.mjs";
 import { writeCanonicalJson } from "../pipeline/atomic-store.mjs";
 import { registerArtifact } from "../pipeline/artifact-store.mjs";
 import { transitionJob } from "../pipeline/state-machine.mjs";
-import { hashCanonical } from "../pipeline/canonical-json.mjs";
+import { hashCanonical, sha256Bytes } from "../pipeline/canonical-json.mjs";
 
 function plannerError(code, message) {
   const error = new Error(message);
