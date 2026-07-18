@@ -131,11 +131,9 @@ export function createMasterOrchestrator({ services, renderReviewBundle }) {
     }
 
     if (stageId === "concept_selection") {
-      const optArt = manifest.artifacts?.find(a => a.logicalRole === "yadam.concept.options" && a.gateStatus === "pass");
-      const inputHash = optArt ? optArt.sha256 : row.inputHash;
       const selArt = manifest.artifacts?.find(a => a.logicalRole === "yadam.concept.selection" && a.gateStatus === "pass");
       const outputHash = selArt ? selArt.sha256 : row.outputHash;
-      return { inputHash, outputHash };
+      return { inputHash: row.inputHash, outputHash };
     }
 
     if (stageId === "approval_1_bundle") {
@@ -174,52 +172,38 @@ export function createMasterOrchestrator({ services, renderReviewBundle }) {
     }
 
     if (stageId === "script_plan") {
-      const bibleArt = manifest.artifacts?.find(a => a.logicalRole === "yadam.story.bible" && a.gateStatus === "pass");
-      const inputHash = bibleArt ? bibleArt.sha256 : row.inputHash;
       const planArt = manifest.artifacts?.find(a => a.logicalRole === "yadam.script.plan" && a.gateStatus === "pass");
-      return { inputHash, outputHash: planArt ? planArt.sha256 : row.outputHash };
+      return { inputHash: row.inputHash, outputHash: planArt ? planArt.sha256 : row.outputHash };
     }
 
     if (stageId === "final_script_qa") {
-      const planArt = manifest.artifacts?.find(a => a.logicalRole === "yadam.script.plan" && a.gateStatus === "pass");
-      const inputHash = planArt ? planArt.sha256 : row.inputHash;
       const packageArt = manifest.artifacts?.find(a => a.logicalRole === "yadam.script.scenes" && a.gateStatus === "pass");
-      return { inputHash, outputHash: packageArt ? packageArt.sha256 : row.outputHash };
+      return { inputHash: row.inputHash, outputHash: packageArt ? packageArt.sha256 : row.outputHash };
     }
 
     if (stageId === "thumbnail_plan") {
-      const scenesArt = manifest.artifacts?.find(a => a.logicalRole === "yadam.script.scenes" && a.gateStatus === "pass");
-      const inputHash = scenesArt ? scenesArt.sha256 : row.inputHash;
       const tPlanArt = manifest.artifacts?.find(a => a.logicalRole === "yadam.thumbnail.plan" && a.gateStatus === "pass");
-      return { inputHash, outputHash: tPlanArt ? tPlanArt.sha256 : row.outputHash };
+      return { inputHash: row.inputHash, outputHash: tPlanArt ? tPlanArt.sha256 : row.outputHash };
     }
 
     if (stageId === "thumbnail_copy_selection") {
-      const tPlanArt = manifest.artifacts?.find(a => a.logicalRole === "yadam.thumbnail.plan" && a.gateStatus === "pass");
-      const inputHash = tPlanArt ? tPlanArt.sha256 : row.inputHash;
       const selArt = manifest.artifacts?.find(a => a.logicalRole === "yadam.thumbnail.selection" && a.gateStatus === "pass");
-      return { inputHash, outputHash: selArt ? selArt.sha256 : row.outputHash };
+      return { inputHash: row.inputHash, outputHash: selArt ? selArt.sha256 : row.outputHash };
     }
 
     if (stageId === "approval_2_previews") {
-      const scenesArt = manifest.artifacts?.find(a => a.logicalRole === "yadam.script.scenes" && a.gateStatus === "pass");
-      const inputHash = scenesArt ? scenesArt.sha256 : row.inputHash;
       const prevArt = manifest.artifacts?.find(a => a.logicalRole === "yadam.preview.manifest" && a.gateStatus === "pass");
-      return { inputHash, outputHash: prevArt ? prevArt.sha256 : row.outputHash };
+      return { inputHash: row.inputHash, outputHash: prevArt ? prevArt.sha256 : row.outputHash };
     }
 
     if (stageId === "approval_2_bundle") {
-      const prevArt = manifest.artifacts?.find(a => a.logicalRole === "yadam.preview.manifest" && a.gateStatus === "pass");
-      const inputHash = prevArt ? prevArt.sha256 : row.inputHash;
       const bundle2Art = manifest.artifacts?.find(a => a.logicalRole === "yadam.approval.2.bundle" && a.gateStatus === "pass");
-      return { inputHash, outputHash: bundle2Art ? bundle2Art.sha256 : row.outputHash };
+      return { inputHash: row.inputHash, outputHash: bundle2Art ? bundle2Art.sha256 : row.outputHash };
     }
 
     if (stageId === "reference_promotion") {
-      const app2Art = manifest.artifacts?.find(a => a.logicalRole === "yadam.approval.2" && a.gateStatus === "pass");
-      const inputHash = app2Art ? app2Art.sha256 : row.inputHash;
       const refPointer = manifest.artifacts?.find(a => a.logicalRole === "yadam.character.reference-pointer" && a.gateStatus === "pass");
-      return { inputHash, outputHash: refPointer ? refPointer.sha256 : row.outputHash };
+      return { inputHash: row.inputHash, outputHash: refPointer ? refPointer.sha256 : row.outputHash };
     }
 
     if (stageId === "production_images") {
