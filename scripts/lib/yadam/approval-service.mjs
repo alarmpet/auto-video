@@ -3,7 +3,7 @@ import { join, dirname, resolve } from "node:path";
 import { readFile, open, unlink, mkdir } from "node:fs/promises";
 import { loadJob } from "../pipeline/job-store.mjs";
 import { writeCanonicalJson, writeCanonicalJsonExclusive } from "../pipeline/atomic-store.mjs";
-import { registerArtifact } from "../pipeline/artifact-store.mjs";
+import { registerArtifact, canReuseArtifact } from "../pipeline/artifact-store.mjs";
 import { transitionJob } from "../pipeline/state-machine.mjs";
 import { sha256Bytes, hashCanonical, canonicalJson } from "../pipeline/canonical-json.mjs";
 import { loadYadamReferences } from "./reference-store.mjs";
@@ -106,61 +106,77 @@ export async function buildApprovalOneBundle({ jobDir }) {
   const introPromptPath = join(workspaceRoot, "prompts/yadam/story-intro.md");
   const introSchemaPath = join(workspaceRoot, "schemas/yadam/hook-brief.schema.json");
 
-  let introResult;
-  let introAttempt = 1;
-  let introViolations = [];
-  let introRejectedHash = "0000000000000000000000000000000000000000000000000000000000000000";
+  let hookBriefHash;
+  let introPayload;
 
-  const introStageInput = {
-    selectedCandidate,
-    userInstructions: selection.userInstructions
+  const introDependencies = {
+    "conceptSelection": selectionRecord.sha256
   };
+  const introReusable = await canReuseArtifact(jobDir, "yadam-hook-brief", introDependencies);
 
-  try {
-    introResult = await runYadamJsonStage({
-      jobDir,
-      stageId: "yadam.story.intro.v1",
-      promptPath: introPromptPath,
-      schemaPath: introSchemaPath,
-      input: introStageInput,
-      timeoutMs: 480000
-    });
-    introViolations = checkIntroHardGates(introResult.payload, references);
-    if (introViolations.length > 0) {
-      const err = new Error("Intro hard gate failed");
-      err.code = "intro_hard_gate_failed";
-      err.details = introViolations;
-      err.payload = introResult.payload;
-      throw err;
+  if (introReusable) {
+    const hookBriefPath = join(jobDir, "planning/hook-brief.json");
+    const bytes = await readFile(hookBriefPath);
+    hookBriefHash = sha256Bytes(bytes);
+    introPayload = JSON.parse(bytes.toString("utf8"));
+  } else {
+    let introResult;
+    let introAttempt = 1;
+    let introViolations = [];
+    let introRejectedHash = "0000000000000000000000000000000000000000000000000000000000000000";
+
+    const introStageInput = {
+      selectedCandidate,
+      userInstructions: selection.userInstructions
+    };
+
+    try {
+      introResult = await runYadamJsonStage({
+        jobDir,
+        stageId: "yadam.story.intro.v1",
+        promptPath: introPromptPath,
+        schemaPath: introSchemaPath,
+        input: introStageInput,
+        timeoutMs: 480000
+      });
+      introViolations = checkIntroHardGates(introResult.payload, references);
+      if (introViolations.length > 0) {
+        const err = new Error("Intro hard gate failed");
+        err.code = "intro_hard_gate_failed";
+        err.details = introViolations;
+        err.payload = introResult.payload;
+        throw err;
+      }
+    } catch (err) {
+      introAttempt = 2;
+      introRejectedHash = err.payload ? hashCanonical(err.payload) : "0000000000000000000000000000000000000000000000000000000000000000";
+      introViolations = err.details || [err.message];
     }
-  } catch (err) {
-    introAttempt = 2;
-    introRejectedHash = err.payload ? hashCanonical(err.payload) : "0000000000000000000000000000000000000000000000000000000000000000";
-    introViolations = err.details || [err.message];
-  }
 
-  if (introAttempt === 2) {
-    introResult = await runYadamJsonStage({
-      jobDir,
-      stageId: "yadam.story.intro.v1.repair-1",
-      promptPath: introPromptPath,
-      schemaPath: introSchemaPath,
-      input: {
-        ...introStageInput,
-        violations: introViolations.sort(),
-        rejectedOutputHash: introRejectedHash
-      },
-      timeoutMs: 480000
-    });
-    const repViolations = checkIntroHardGates(introResult.payload, references);
-    if (repViolations.length > 0) {
-      throw approvalError("intro_hard_gate_failed", `Intro repair failed: ${repViolations.join(", ")}`);
+    if (introAttempt === 2) {
+      introResult = await runYadamJsonStage({
+        jobDir,
+        stageId: "yadam.story.intro.v1.repair-1",
+        promptPath: introPromptPath,
+        schemaPath: introSchemaPath,
+        input: {
+          ...introStageInput,
+          violations: introViolations.sort(),
+          rejectedOutputHash: introRejectedHash
+        },
+        timeoutMs: 480000
+      });
+      const repViolations = checkIntroHardGates(introResult.payload, references);
+      if (repViolations.length > 0) {
+        throw approvalError("intro_hard_gate_failed", `Intro repair failed: ${repViolations.join(", ")}`);
+      }
     }
-  }
 
-  const hookBriefPath = join(jobDir, "planning/hook-brief.json");
-  const hookWrite = await writeCanonicalJson(hookBriefPath, introResult.payload);
-  const hookBriefHash = hookWrite.sha256;
+    introPayload = introResult.payload;
+    const hookBriefPath = join(jobDir, "planning/hook-brief.json");
+    const hookWrite = await writeCanonicalJson(hookBriefPath, introPayload);
+    hookBriefHash = hookWrite.sha256;
+  }
 
   await registerArtifact(jobDir, {
     artifactId: "yadam-hook-brief",
@@ -179,63 +195,79 @@ export async function buildApprovalOneBundle({ jobDir }) {
   const outlinePromptPath = join(workspaceRoot, "prompts/yadam/outline.md");
   const outlineSchemaPath = join(workspaceRoot, "schemas/yadam/outline.schema.json");
 
-  let outlineResult;
-  let outlineAttempt = 1;
-  let outlineViolations = [];
-  let outlineRejectedHash = "0000000000000000000000000000000000000000000000000000000000000000";
+  let outlineHash;
+  let outlinePayload;
 
-  const outlineStageInput = {
-    selectedCandidate,
-    userInstructions: selection.userInstructions,
-    hookBriefHash,
-    fixedEnding: references.beats.fixedEnding
+  const outlineDependencies = {
+    "hookBrief": hookBriefHash
   };
+  const outlineReusable = await canReuseArtifact(jobDir, "yadam-outline", outlineDependencies);
 
-  try {
-    outlineResult = await runYadamJsonStage({
-      jobDir,
-      stageId: "yadam.outline.v1",
-      promptPath: outlinePromptPath,
-      schemaPath: outlineSchemaPath,
-      input: outlineStageInput,
-      timeoutMs: 480000
-    });
-    outlineViolations = checkOutlineHardGates(outlineResult.payload, references);
-    if (outlineViolations.length > 0) {
-      const err = new Error("Outline hard gate failed");
-      err.code = "outline_hard_gate_failed";
-      err.details = outlineViolations;
-      err.payload = outlineResult.payload;
-      throw err;
+  if (outlineReusable) {
+    const outlinePath = join(jobDir, "planning/outline.json");
+    const bytes = await readFile(outlinePath);
+    outlineHash = sha256Bytes(bytes);
+    outlinePayload = JSON.parse(bytes.toString("utf8"));
+  } else {
+    let outlineResult;
+    let outlineAttempt = 1;
+    let outlineViolations = [];
+    let outlineRejectedHash = "0000000000000000000000000000000000000000000000000000000000000000";
+
+    const outlineStageInput = {
+      selectedCandidate,
+      userInstructions: selection.userInstructions,
+      hookBriefHash,
+      fixedEnding: references.beats.fixedEnding
+    };
+
+    try {
+      outlineResult = await runYadamJsonStage({
+        jobDir,
+        stageId: "yadam.outline.v1",
+        promptPath: outlinePromptPath,
+        schemaPath: outlineSchemaPath,
+        input: outlineStageInput,
+        timeoutMs: 480000
+      });
+      outlineViolations = checkOutlineHardGates(outlineResult.payload, references);
+      if (outlineViolations.length > 0) {
+        const err = new Error("Outline hard gate failed");
+        err.code = "outline_hard_gate_failed";
+        err.details = outlineViolations;
+        err.payload = outlineResult.payload;
+        throw err;
+      }
+    } catch (err) {
+      outlineAttempt = 2;
+      outlineRejectedHash = err.payload ? hashCanonical(err.payload) : "0000000000000000000000000000000000000000000000000000000000000000";
+      outlineViolations = err.details || [err.message];
     }
-  } catch (err) {
-    outlineAttempt = 2;
-    outlineRejectedHash = err.payload ? hashCanonical(err.payload) : "0000000000000000000000000000000000000000000000000000000000000000";
-    outlineViolations = err.details || [err.message];
-  }
 
-  if (outlineAttempt === 2) {
-    outlineResult = await runYadamJsonStage({
-      jobDir,
-      stageId: "yadam.outline.v1.repair-1",
-      promptPath: outlinePromptPath,
-      schemaPath: outlineSchemaPath,
-      input: {
-        ...outlineStageInput,
-        violations: outlineViolations.sort(),
-        rejectedOutputHash: outlineRejectedHash
-      },
-      timeoutMs: 480000
-    });
-    const repViolations = checkOutlineHardGates(outlineResult.payload, references);
-    if (repViolations.length > 0) {
-      throw approvalError("outline_hard_gate_failed", `Outline repair failed: ${repViolations.join(", ")}`);
+    if (outlineAttempt === 2) {
+      outlineResult = await runYadamJsonStage({
+        jobDir,
+        stageId: "yadam.outline.v1.repair-1",
+        promptPath: outlinePromptPath,
+        schemaPath: outlineSchemaPath,
+        input: {
+          ...outlineStageInput,
+          violations: outlineViolations.sort(),
+          rejectedOutputHash: outlineRejectedHash
+        },
+        timeoutMs: 480000
+      });
+      const repViolations = checkOutlineHardGates(outlineResult.payload, references);
+      if (repViolations.length > 0) {
+        throw approvalError("outline_hard_gate_failed", `Outline repair failed: ${repViolations.join(", ")}`);
+      }
     }
-  }
 
-  const outlinePath = join(jobDir, "planning/outline.json");
-  const outlineWrite = await writeCanonicalJson(outlinePath, outlineResult.payload);
-  const outlineHash = outlineWrite.sha256;
+    outlinePayload = outlineResult.payload;
+    const outlinePath = join(jobDir, "planning/outline.json");
+    const outlineWrite = await writeCanonicalJson(outlinePath, outlinePayload);
+    outlineHash = outlineWrite.sha256;
+  }
 
   await registerArtifact(jobDir, {
     artifactId: "yadam-outline",
