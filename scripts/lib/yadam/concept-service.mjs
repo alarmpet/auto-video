@@ -1,5 +1,5 @@
 // scripts/lib/yadam/concept-service.mjs
-import { join, dirname } from "node:path";
+import { join, dirname, resolve } from "node:path";
 import { readFile } from "node:fs/promises";
 import { loadJob } from "../pipeline/job-store.mjs";
 import { writeCanonicalJson } from "../pipeline/atomic-store.mjs";
