@@ -247,6 +247,12 @@ async function main() {
           to: "running",
           inputHash
         });
+      } else if (job.state.status === "needs_review") {
+        await transitionJob(args.job, {
+          stage: "resume-run",
+          to: "running",
+          inputHash: "0000000000000000000000000000000000000000000000000000000000000000"
+        });
       }
       const result = await orchestrator.runJobUntilBlocked({ jobDir: args.job });
       console.log(JSON.stringify({
