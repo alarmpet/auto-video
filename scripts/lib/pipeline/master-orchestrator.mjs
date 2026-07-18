@@ -506,8 +506,8 @@ export function createMasterOrchestrator({ services, renderReviewBundle }) {
             }));
             result = await services.buildApprovalTwoBundle({ jobDir: resolvedJobDir, previewArtifacts });
           } else if (method === "promoteApprovedReferenceSet") {
-            const visualPlanningInput = await services.getApprovedVisualPlanningInput(resolvedJobDir);
-            result = await services.promoteApprovedReferenceSet({ jobDir: resolvedJobDir, approvalRevisionPath: visualPlanningInput.approvalRevisionPath });
+            const ptr = JSON.parse(readFileSync(join(resolvedJobDir, "approvals/current-approval-2.json"), "utf8"));
+            result = await services.promoteApprovedReferenceSet({ jobDir: resolvedJobDir, approvalRevisionPath: ptr.path });
           } else if (method === "recordCompletedStoryFingerprint") {
             result = await services.recordCompletedStoryFingerprint({ jobDir: resolvedJobDir, historyPath: STORY_HISTORY_PATH, completedAt: new Date().toISOString() });
           } else if (method === "draftNextSegment") {

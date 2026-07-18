@@ -3,8 +3,23 @@ import { loadProfile, loadHostConfig, validateTargetMinutes } from "./lib/pipeli
 import { createJob, loadJob } from "./lib/pipeline/job-store.mjs";
 import { transitionJob } from "./lib/pipeline/state-machine.mjs";
 import { discoverCodex, preflightCodex } from "./lib/providers/codex-cli.mjs";
-import { dirname } from "node:path";
+import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+
+// Service Imports for Orchestrator
+import { generateConceptOptions, selectConcept } from "./lib/yadam/concept-service.mjs";
+import { buildApprovalOneBundle, approveConcept, buildApprovalTwoBundle, approveProduction } from "./lib/yadam/approval-service.mjs";
+import { buildStoryBible } from "./lib/yadam/story-bible-service.mjs";
+import { buildScriptPlan } from "./lib/yadam/script-planner.mjs";
+import { draftNextSegment } from "./lib/yadam/segment-drafter.mjs";
+import { finalizeScriptPackage, recordCompletedStoryFingerprint } from "./lib/yadam/script-service.mjs";
+import { generateThumbnailPlan, selectThumbnailCopy } from "./lib/yadam/thumbnail-service.mjs";
+import { buildApproval2Previews, promoteApprovedReferenceSet, generateProductionImages } from "./lib/yadam/image-service.mjs";
+import { runFullTts } from "./lib/yadam/tts-service.mjs";
+import { assembleAllSegments, publishFinalVideo, loadFinalQa } from "./lib/yadam/video-service.mjs";
+
+import { createMasterOrchestrator } from "./lib/pipeline/master-orchestrator.mjs";
+import { renderReviewBundle } from "./lib/pipeline/review-bundle.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -26,10 +41,32 @@ const definitions = {
     provider: { type: "string", required: true, enum: ["codex"] },
     "no-generate": { type: "boolean", required: false }
   },
-  cancel: {
+  "select-concept": {
+    job: { type: "string", required: true },
+    option: { type: "string", required: true },
+    note: { type: "string", required: false }
+  },
+  "approve-concept": {
+    job: { type: "string", required: true },
+    "artifact-set-hash": { type: "string", required: true },
+    note: { type: "string", required: false }
+  },
+  "select-thumbnail-copy": {
+    job: { type: "string", required: true },
+    copy: { type: "string", required: true }
+  },
+  "approve-production": {
+    job: { type: "string", required: true },
+    "artifact-set-hash": { type: "string", required: true },
+    note: { type: "string", required: false }
+  },
+  run: {
     job: { type: "string", required: true }
   },
   resume: {
+    job: { type: "string", required: true }
+  },
+  cancel: {
     job: { type: "string", required: true }
   }
 };
@@ -53,6 +90,26 @@ async function main() {
   }
 
   const { command, args } = parsed;
+
+  const services = {
+    generateConceptOptions,
+    buildApprovalOneBundle,
+    buildStoryBible,
+    buildScriptPlan,
+    draftNextSegment,
+    finalizeScriptPackage,
+    generateThumbnailPlan,
+    buildApproval2Previews,
+    promoteApprovedReferenceSet,
+    generateProductionImages,
+    runFullTts,
+    assembleAllSegments,
+    publishFinalVideo,
+    loadFinalQa,
+    recordCompletedStoryFingerprint
+  };
+
+  const orchestrator = createMasterOrchestrator({ services, renderReviewBundle });
 
   try {
     if (command === "new") {
@@ -133,7 +190,69 @@ async function main() {
           }
         }));
       }
+    } else if (command === "select-concept") {
+      const result = await selectConcept({
+        jobDir: args.job,
+        candidateId: args.option,
+        userInstructions: args.note || "",
+        selectedAt: new Date().toISOString()
+      });
+      console.log(JSON.stringify({
+        ok: true,
+        command: "select-concept",
+        result
+      }));
+    } else if (command === "approve-concept") {
+      const result = await approveConcept({
+        jobDir: args.job,
+        expectedArtifactSetHash: args["artifact-set-hash"],
+        approvedAt: new Date().toISOString(),
+        userInstructions: args.note || ""
+      });
+      console.log(JSON.stringify({
+        ok: true,
+        command: "approve-concept",
+        result
+      }));
+    } else if (command === "select-thumbnail-copy") {
+      const result = await selectThumbnailCopy({
+        jobDir: args.job,
+        copyId: args.copy,
+        selectedAt: new Date().toISOString()
+      });
+      console.log(JSON.stringify({
+        ok: true,
+        command: "select-thumbnail-copy",
+        result
+      }));
+    } else if (command === "approve-production") {
+      const result = await approveProduction({
+        jobDir: args.job,
+        expectedArtifactSetHash: args["artifact-set-hash"],
+        approvedAt: new Date().toISOString(),
+        userInstructions: args.note || ""
+      });
+      console.log(JSON.stringify({
+        ok: true,
+        command: "approve-production",
+        result
+      }));
+    } else if (command === "run") {
+      const result = await orchestrator.runJobUntilBlocked({ jobDir: args.job });
+      console.log(JSON.stringify({
+        ok: true,
+        command: "run",
+        result
+      }));
+    } else if (command === "resume") {
+      const result = await orchestrator.resumeJob({ jobDir: args.job });
+      console.log(JSON.stringify({
+        ok: true,
+        command: "resume",
+        result
+      }));
     } else if (command === "cancel") {
+      // For now, write transition state
       const { manifest } = await loadJob(args.job);
       const reqArt = manifest.artifacts.find(a => a.artifactId === "pipeline-request");
       const inputHash = reqArt ? reqArt.sha256 : "0000000000000000000000000000000000000000000000000000000000000000";
@@ -150,21 +269,6 @@ async function main() {
         result: {
           jobId: state.jobId,
           status: state.status
-        }
-      }));
-    } else if (command === "resume") {
-      const context = await loadJob(args.job);
-      let nextStage = "planning";
-      if (context.state.history.some(h => h.stage === "planning")) {
-        nextStage = "script-generation";
-      }
-
-      console.log(JSON.stringify({
-        ok: true,
-        command: "resume",
-        result: {
-          jobId: context.state.jobId,
-          nextStage
         }
       }));
     }
