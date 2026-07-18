@@ -270,13 +270,13 @@ export async function buildApprovalOneBundle({ jobDir }) {
   };
 
   const bundlePath = join(jobDir, "approvals/approval-1-bundle.json");
-  await writeCanonicalJson(bundlePath, bundle);
-
+  const bundleWrite = await writeCanonicalJson(bundlePath, bundle);
+  
   await registerArtifact(jobDir, {
     artifactId: "yadam-approval-1-bundle",
     logicalRole: "yadam.approval.1.bundle",
     path: "approvals/approval-1-bundle.json",
-    sha256: sha256Bytes(Buffer.from(canonicalJson(bundle), "utf8")),
+    sha256: bundleWrite.sha256,
     schemaVersion: "1.0.0",
     producerStage: "approval-1-generation",
     gateStatus: "pass",
