@@ -34,7 +34,9 @@ export async function runYadamJsonStage({
   const canonicalInput = canonicalJson(input);
   const inputHash = sha256Bytes(Buffer.from(canonicalInput, "utf8"));
 
-  const prompt = `${nfcPromptBody.trimEnd()}\n\n--- BEGIN CANONICAL INPUT JSON ---\n${canonicalInput}\n--- END CANONICAL INPUT JSON ---\n`;
+  const prompt = `${nfcPromptBody.trimEnd()}\n\n` +
+    `You must set the "inputHash" field in the output JSON to exactly: "${inputHash}" (echo it byte-for-byte).\n\n` +
+    `--- BEGIN CANONICAL INPUT JSON ---\n${canonicalInput}\n--- END CANONICAL INPUT JSON ---\n`;
 
   const result = await runStage({
     jobDir,
