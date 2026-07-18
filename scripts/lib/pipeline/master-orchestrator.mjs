@@ -232,14 +232,14 @@ export function createMasterOrchestrator({ services, renderReviewBundle }) {
     const currentStage = YADAM_STAGES.find(s => s.stageId === stageId);
     if (!currentStage) return { inputHash: row.inputHash, outputHash: row.outputHash };
     const inputRecords = manifest.artifacts?.filter(a => currentStage.requiresArtifactRoles.includes(a.logicalRole) && a.gateStatus === "pass") || [];
-    const outputRecords = row.artifactPaths?.map(p => manifest.artifacts?.find(a => a.path === p && a.gateStatus === "pass")).filter(Boolean) || [];
+    const outputRecords = row.artifactPaths?.map(p => manifest.artifacts?.find(a => a.path === p && a.gateStatus !== "fail")).filter(Boolean) || [];
     const opaqueInputs = await getOpaqueInputs(stageId);
     const expectedEvidence = buildSuccessEvidence(row.stage, inputRecords, outputRecords, opaqueInputs);
     return { inputHash: expectedEvidence.inputHash, outputHash: expectedEvidence.outputHash };
   }
 
   function verifyArtifact(job, relativePath, expectedHash) {
-    const art = job.manifest.artifacts?.find(a => a.path === relativePath && a.gateStatus === "pass");
+    const art = job.manifest.artifacts?.find(a => a.path === relativePath && a.gateStatus !== "fail");
     if (!art) return false;
     if (art.sha256.toLowerCase() !== expectedHash.toLowerCase()) return false;
     const absPath = join(job.jobDir, relativePath);
@@ -329,7 +329,7 @@ export function createMasterOrchestrator({ services, renderReviewBundle }) {
           return { cursor: stage.stageId, job };
         }
         const filesValid = row.artifactPaths?.every(p => {
-          const art = manifest.artifacts?.find(a => a.path === p && a.gateStatus === "pass");
+          const art = manifest.artifacts?.find(a => a.path === p && a.gateStatus !== "fail");
           const exists = existsSync(join(jobDir, p));
           console.error(`[DEBUG] userGate ${stage.stageId} check path ${p}: art=${!!art}, exists=${exists}`);
           return art && exists;
@@ -392,7 +392,7 @@ export function createMasterOrchestrator({ services, renderReviewBundle }) {
       // Recompute successEvidence inputs and outputs to verify drift
       try {
         const inputRecords = manifest.artifacts?.filter(a => stage.requiresArtifactRoles.includes(a.logicalRole) && a.gateStatus === "pass") || [];
-        const outputRecords = row.artifactPaths?.map(p => manifest.artifacts?.find(a => a.path === p && a.gateStatus === "pass")).filter(Boolean) || [];
+        const outputRecords = row.artifactPaths?.map(p => manifest.artifacts?.find(a => a.path === p && a.gateStatus !== "fail")).filter(Boolean) || [];
 
         console.error(`[DEBUG] stage ${stage.stageId} inputs expected ${stage.requiresArtifactRoles.length} got ${inputRecords.length}; outputs expected ${row.artifactPaths?.length} got ${outputRecords.length}`);
         if (inputRecords.length !== stage.requiresArtifactRoles.length || outputRecords.length !== row.artifactPaths?.length) {

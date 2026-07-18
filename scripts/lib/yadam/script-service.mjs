@@ -101,7 +101,7 @@ export async function finalizeScriptPackage({ jobDir }) {
   const ssWrite = await writeCanonicalJson(scriptScenesPath, scriptScenesPayload);
 
   // Write final.txt
-  const finalTextContent = renderFinalText(scenes);
+  const finalTextContent = renderFinalText(scenes.map(s => ({ ...s, text: s.sourceText })));
   const finalTextPath = join(jobDir, "script/final.txt");
   await writeFile(finalTextPath, finalTextContent, "utf8");
   const ftHash = sha256Bytes(Buffer.from(finalTextContent, "utf8"));
