@@ -282,6 +282,8 @@ export function createMasterOrchestrator({ services, renderReviewBundle }) {
       return { cursor: "completed", job };
     }
 
+    let evaluationFloorIndex = 0;
+
     // 1. Check Approval 2 forward floor (Seals through approval_2)
     const currentApp2Path = join(jobDir, "approvals/current-approval-2.json");
     if (existsSync(currentApp2Path)) {
@@ -301,7 +303,7 @@ export function createMasterOrchestrator({ services, renderReviewBundle }) {
               }
             }
             if (closureValid) {
-              return { cursor: "reference_promotion", job };
+              evaluationFloorIndex = YADAM_STAGES.findIndex(s => s.stageId === "reference_promotion");
             }
           }
         }
@@ -309,46 +311,54 @@ export function createMasterOrchestrator({ services, renderReviewBundle }) {
     }
 
     // 2. Check Approval 1 forward floor (Seals through approval_1)
-    const currentApp1Path = join(jobDir, "approvals/current-approval-1.json");
-    if (existsSync(currentApp1Path)) {
-      try {
-        const ptr = JSON.parse(readFileSync(currentApp1Path, "utf8"));
-        if (ptr.status === "valid") {
-          const app1Art = manifest.artifacts?.find(a => a.logicalRole === "yadam.approval.1" && a.gateStatus === "pass" && a.path === ptr.path && a.sha256 === ptr.sha256);
-          const historyRow = state.history?.find(h => h.stage === "APPROVAL_ONE_GRANTED" && h.to === "running" && h.inputHash === ptr.approvedArtifactSetHash && h.outputHash === ptr.sha256);
-          if (app1Art && historyRow) {
-            // Verify dependency closure
-            let closureValid = true;
-            for (const [depId, depHash] of Object.entries(app1Art.dependencyHashes || {})) {
-              const matchedDep = manifest.artifacts?.find(a => a.artifactId === depId && a.gateStatus === "pass" && a.sha256.toLowerCase() === depHash.toLowerCase());
-              if (!matchedDep || !existsSync(join(jobDir, matchedDep.path))) {
-                closureValid = false;
-                break;
+    if (evaluationFloorIndex === 0) {
+      const currentApp1Path = join(jobDir, "approvals/current-approval-1.json");
+      if (existsSync(currentApp1Path)) {
+        try {
+          const ptr = JSON.parse(readFileSync(currentApp1Path, "utf8"));
+          if (ptr.status === "valid") {
+            const app1Art = manifest.artifacts?.find(a => a.logicalRole === "yadam.approval.1" && a.gateStatus === "pass" && a.path === ptr.path && a.sha256 === ptr.sha256);
+            const historyRow = state.history?.find(h => h.stage === "APPROVAL_ONE_GRANTED" && h.to === "running" && h.inputHash === ptr.approvedArtifactSetHash && h.outputHash === ptr.sha256);
+            if (app1Art && historyRow) {
+              // Verify dependency closure
+              let closureValid = true;
+              for (const [depId, depHash] of Object.entries(app1Art.dependencyHashes || {})) {
+                const matchedDep = manifest.artifacts?.find(a => a.artifactId === depId && a.gateStatus === "pass" && a.sha256.toLowerCase() === depHash.toLowerCase());
+                if (!matchedDep || !existsSync(join(jobDir, matchedDep.path))) {
+                  closureValid = false;
+                  break;
+                }
+              }
+              if (closureValid) {
+                evaluationFloorIndex = YADAM_STAGES.findIndex(s => s.stageId === "story_bible");
               }
             }
-            if (closureValid) {
-              return { cursor: "story_bible", job };
-            }
           }
-        }
-      } catch {}
+        } catch {}
+      }
     }
 
-    // Sequentially resolve cursor from the beginning
-    for (const stage of YADAM_STAGES) {
+    // Sequentially resolve cursor from evaluationFloorIndex
+    for (let i = evaluationFloorIndex; i < YADAM_STAGES.length; i++) {
+      const stage = YADAM_STAGES[i];
       if (stage.userGate) {
         const expectedTo = STAGE_TO_STATUS[stage.successEvent];
         const row = state.history?.find(h => h.stage === stage.successEvent && h.to === expectedTo);
         if (!row) {
+          console.error(`[DEBUG] userGate ${stage.stageId} row not found for successEvent ${stage.successEvent} to ${expectedTo}`);
           return { cursor: stage.stageId, job };
         }
         const filesValid = row.artifactPaths?.every(p => {
           const art = manifest.artifacts?.find(a => a.path === p && a.gateStatus === "pass");
-          return art && existsSync(join(jobDir, p));
+          const exists = existsSync(join(jobDir, p));
+          console.error(`[DEBUG] userGate ${stage.stageId} check path ${p}: art=${!!art}, exists=${exists}`);
+          return art && exists;
         });
         if (!filesValid) {
+          console.error(`[DEBUG] userGate ${stage.stageId} filesValid is false`);
           return { cursor: stage.stageId, job };
         }
+        console.error(`[DEBUG] userGate ${stage.stageId} is valid, advancing`);
         continue;
       }
 
@@ -357,11 +367,13 @@ export function createMasterOrchestrator({ services, renderReviewBundle }) {
         try {
           const scriptPlanArt = manifest.artifacts?.find(a => a.logicalRole === "yadam.script.plan" && a.gateStatus === "pass");
           if (!scriptPlanArt) {
+            console.error(`[DEBUG] segment_drafts: yadam.script.plan not found`);
             return { cursor: "segment_drafts", job };
           }
           const scriptPlan = JSON.parse(readFileSync(join(jobDir, scriptPlanArt.path), "utf8"));
           const plannedSegments = scriptPlan.segments || [];
           if (plannedSegments.length === 0) {
+            console.error(`[DEBUG] segment_drafts: plannedSegments length is 0`);
             return { cursor: "segment_drafts", job };
           }
 
@@ -369,17 +381,22 @@ export function createMasterOrchestrator({ services, renderReviewBundle }) {
           for (const seg of plannedSegments) {
             const segArt = manifest.artifacts?.find(a => a.logicalRole === "yadam.script.segment" && a.path.includes(seg.segmentId) && a.gateStatus === "pass");
             const segRow = state.history?.find(h => h.stage === "SEGMENT_DRAFTED" && h.to === "running" && h.artifactPaths?.includes(segArt?.path));
-            if (!segArt || !segRow || !existsSync(join(jobDir, segArt.path))) {
+            const exists = segArt ? existsSync(join(jobDir, segArt.path)) : false;
+            console.error(`[DEBUG] segment_drafts check ${seg.segmentId}: segArt=${!!segArt}, segRow=${!!segRow}, exists=${exists}`);
+            if (!segArt || !segRow || !exists) {
               allSegmentsValid = false;
               break;
             }
           }
 
           if (!allSegmentsValid) {
+            console.error(`[DEBUG] segment_drafts: not all segments valid`);
             return { cursor: "segment_drafts", job };
           }
+          console.error(`[DEBUG] segment_drafts: all segments valid, advancing`);
           continue;
-        } catch {
+        } catch (err) {
+          console.error(`[DEBUG] segment_drafts: caught error:`, err.message);
           return { cursor: "segment_drafts", job };
         }
       }
@@ -388,6 +405,7 @@ export function createMasterOrchestrator({ services, renderReviewBundle }) {
       const expectedTo = STAGE_TO_STATUS[stage.successEvent];
       const row = state.history?.find(h => h.stage === stage.successEvent && h.to === expectedTo);
       if (!row) {
+        console.error(`[DEBUG] stage ${stage.stageId} row not found for successEvent ${stage.successEvent} to ${expectedTo}`);
         return { cursor: stage.stageId, job };
       }
 
@@ -396,25 +414,35 @@ export function createMasterOrchestrator({ services, renderReviewBundle }) {
         const inputRecords = manifest.artifacts?.filter(a => stage.requiresArtifactRoles.includes(a.logicalRole) && a.gateStatus === "pass") || [];
         const outputRecords = row.artifactPaths?.map(p => manifest.artifacts?.find(a => a.path === p && a.gateStatus === "pass")).filter(Boolean) || [];
 
+        console.error(`[DEBUG] stage ${stage.stageId} inputs expected ${stage.requiresArtifactRoles.length} got ${inputRecords.length}; outputs expected ${row.artifactPaths?.length} got ${outputRecords.length}`);
         if (inputRecords.length !== stage.requiresArtifactRoles.length || outputRecords.length !== row.artifactPaths?.length) {
           return { cursor: stage.stageId, job };
         }
 
         const expected = await computeExpectedStageHashes(jobDir, manifest, stage.stageId, row);
+        console.error(`[DEBUG] stage ${stage.stageId} hashes: row.input=${row.inputHash}, exp.input=${expected.inputHash}; row.output=${row.outputHash}, exp.output=${expected.outputHash}`);
 
         if (
           row.inputHash !== expected.inputHash ||
           row.outputHash !== expected.outputHash
         ) {
+          console.error(`[DEBUG] stage ${stage.stageId} hash mismatch`);
           return { cursor: stage.stageId, job };
         }
 
         // Verify physical files on disk
-        const filesValid = outputRecords.every(art => verifyArtifact(job, art.path, art.sha256));
+        const filesValid = outputRecords.every(art => {
+          const val = verifyArtifact(job, art.path, art.sha256);
+          console.error(`[DEBUG] stage ${stage.stageId} verify path ${art.path}: ${val}`);
+          return val;
+        });
         if (!filesValid) {
+          console.error(`[DEBUG] stage ${stage.stageId} filesValid is false`);
           return { cursor: stage.stageId, job };
         }
-      } catch {
+        console.error(`[DEBUG] stage ${stage.stageId} is valid, advancing`);
+      } catch (err) {
+        console.error(`[DEBUG] stage ${stage.stageId} caught error:`, err.message);
         return { cursor: stage.stageId, job };
       }
     }

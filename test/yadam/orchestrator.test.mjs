@@ -156,16 +156,19 @@ test("Orchestrator sequential gates and service calls E2E with fakes", async () 
         const ssWrite = await writeCanonicalJson(join(jobDir, "script/script-scenes.json"), scriptScenes);
         await writeFile(join(jobDir, "script/final.txt"), "hello");
         const ftHash = sha256Bytes(Buffer.from("hello"));
+        const scenePlan = { schemaVersion: "1.0.0" };
+        const spWrite = await writeCanonicalJson(join(jobDir, "planning/scene-plan.json"), scenePlan);
 
         const manifest = JSON.parse(readFileSync(jobDir + "/artifact-manifest.json", "utf8"));
         manifest.artifacts.push(
           { artifactId: "yadam-script-scenes", logicalRole: "yadam.script.scenes", path: "script/script-scenes.json", sha256: ssWrite.sha256, schemaVersion: "1.0.0", producerStage: "finalize", gateStatus: "pass", dependencyHashes: {}, dependencyKinds: {}, dependencyOwners: {} },
-          { artifactId: "yadam-final-text", logicalRole: "yadam.script.final_text", path: "script/final.txt", sha256: ftHash, schemaVersion: "1.0.0", producerStage: "finalize", gateStatus: "pass", dependencyHashes: {}, dependencyKinds: {}, dependencyOwners: {} }
+          { artifactId: "yadam-final-text", logicalRole: "yadam.script.final_text", path: "script/final.txt", sha256: ftHash, schemaVersion: "1.0.0", producerStage: "finalize", gateStatus: "pass", dependencyHashes: {}, dependencyKinds: {}, dependencyOwners: {} },
+          { artifactId: "yadam-scene-plan", logicalRole: "yadam.scene.plan", path: "planning/scene-plan.json", sha256: spWrite.sha256, schemaVersion: "1.0.0", producerStage: "finalize", gateStatus: "pass", dependencyHashes: {}, dependencyKinds: {}, dependencyOwners: {} }
         );
         writeFileSync(jobDir + "/artifact-manifest.json", JSON.stringify(manifest, null, 2));
 
         const state = JSON.parse(readFileSync(jobDir + "/pipeline-state.json", "utf8"));
-        state.history.push({ from: "running", to: "running", stage: "SCRIPT_PACKAGE_READY", inputHash: "0".repeat(64), outputHash: ssWrite.sha256, artifactPaths: ["script/script-scenes.json", "script/final.txt"].sort(), at: new Date().toISOString() });
+        state.history.push({ from: "running", to: "running", stage: "SCRIPT_PACKAGE_READY", inputHash: "0".repeat(64), outputHash: ssWrite.sha256, artifactPaths: ["script/script-scenes.json", "script/final.txt", "planning/scene-plan.json"].sort(), at: new Date().toISOString() });
         writeFileSync(jobDir + "/pipeline-state.json", JSON.stringify(state, null, 2));
       },
 
