@@ -169,10 +169,8 @@ export function createMasterOrchestrator({ services, renderReviewBundle }) {
     }
 
     if (stageId === "story_bible") {
-      const app1Art = manifest.artifacts?.find(a => a.logicalRole === "yadam.approval.1" && a.gateStatus === "pass");
-      const inputHash = app1Art ? app1Art.sha256 : row.inputHash;
       const bibleArt = manifest.artifacts?.find(a => a.logicalRole === "yadam.story.bible" && a.gateStatus === "pass");
-      return { inputHash, outputHash: bibleArt ? bibleArt.sha256 : row.outputHash };
+      return { inputHash: row.inputHash, outputHash: bibleArt ? bibleArt.sha256 : row.outputHash };
     }
 
     if (stageId === "script_plan") {
