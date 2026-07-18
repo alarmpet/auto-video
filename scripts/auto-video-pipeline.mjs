@@ -2,6 +2,7 @@ import { parseCli } from "./lib/pipeline/cli-args.mjs";
 import { loadProfile, loadHostConfig, validateTargetMinutes } from "./lib/pipeline/profile-registry.mjs";
 import { createJob, loadJob } from "./lib/pipeline/job-store.mjs";
 import { transitionJob } from "./lib/pipeline/state-machine.mjs";
+import { sha256Bytes } from "./lib/pipeline/canonical-json.mjs";
 import { discoverCodex, preflightCodex } from "./lib/providers/codex-cli.mjs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -251,7 +252,7 @@ async function main() {
         await transitionJob(args.job, {
           stage: "resume-run",
           to: "running",
-          inputHash: "0000000000000000000000000000000000000000000000000000000000000000"
+          inputHash: sha256Bytes(Buffer.from(new Date().toISOString(), "utf8"))
         });
       }
       const result = await orchestrator.runJobUntilBlocked({ jobDir: args.job });
