@@ -1,5 +1,5 @@
 // scripts/lib/yadam/approval-service.mjs
-import { join, dirname } from "node:path";
+import { join, dirname, resolve } from "node:path";
 import { readFile, open, unlink, mkdir } from "node:fs/promises";
 import { loadJob } from "../pipeline/job-store.mjs";
 import { writeCanonicalJson, writeCanonicalJsonExclusive } from "../pipeline/atomic-store.mjs";
