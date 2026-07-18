@@ -65,7 +65,7 @@ export async function validateSchema(schemaPath, value) {
       message: err.message
     }));
 
-    const error = new Error(`schema validation failed for ${schemaPath}`);
+    const error = new Error(`schema validation failed for ${schemaPath}: ${JSON.stringify(details)}`);
     error.name = "SchemaValidationError";
     error.code = "schema_validation_failed";
     error.details = details;

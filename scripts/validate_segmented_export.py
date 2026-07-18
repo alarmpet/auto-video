@@ -216,49 +216,66 @@ def validate(export_dir: Path) -> dict:
     ready_final_paths: list[Path] = []
     total_ready_duration = 0.0
 
+    is_yadam = manifest.get("profileId") == "yadam"
+
     for segment in manifest.get("segments", []):
-        segment_id = segment.get("id", "<missing-id>")
+        segment_id = segment.get("segmentId" if is_yadam else "id", "<missing-id>")
         segment_dir_value = segment.get("dir")
         if not segment_dir_value:
             failures.append(f"{segment_id}: missing dir in segment manifest")
             continue
-        segment_dir = Path(segment_dir_value)
+        
+        if is_yadam:
+            if Path(segment_dir_value).is_absolute():
+                failures.append(f"{segment_id}: absolute path not allowed in segment manifest: {segment_dir_value}")
+            segment_dir = export_dir / segment_dir_value
+        else:
+            segment_dir = Path(segment_dir_value)
+
         storyboard = segment_dir / "hermes-manual-storyboard.md"
         production = segment_dir / "production.json"
         script = segment_dir / "script.txt"
         script_quality_report = segment_dir / "script-quality-report.json"
         script_quality_suite_report = segment_dir / "script-quality-suite-report.json"
 
-        if not storyboard.exists():
-            failures.append(f"{segment_id}: missing storyboard")
-            continue
-        if not production.exists():
-            failures.append(f"{segment_id}: missing production.json")
-        if not script.exists():
-            failures.append(f"{segment_id}: missing script.txt")
+        # In yadam, Herms manual storyboard / production.json / script.txt are optional or not strictly checked at this final stage
+        if not is_yadam:
+            if not storyboard.exists():
+                failures.append(f"{segment_id}: missing storyboard")
+                continue
+            if not production.exists():
+                failures.append(f"{segment_id}: missing production.json")
+            if not script.exists():
+                failures.append(f"{segment_id}: missing script.txt")
+
         if script_quality_report.exists():
             script_quality = load_json(script_quality_report)
             if script_quality.get("ok") is False:
                 failures.append(f"{segment_id}: script-quality-report failed")
-        else:
+        elif not is_yadam:
             warnings.append(f"{segment_id}: script-quality-report.json not generated yet")
+
         if script_quality_suite_report.exists():
             script_quality_suite = load_json(script_quality_suite_report)
             if script_quality_suite.get("ok") is False:
                 failures.append(f"{segment_id}: script-quality-suite-report failed")
-        else:
+        elif not is_yadam:
             warnings.append(f"{segment_id}: script-quality-suite-report.json not generated yet")
 
-        blocks, storyboard_warnings = parse_storyboard_blocks(storyboard)
-        warnings.extend(f"{segment_id}: {warning}" for warning in storyboard_warnings)
         expected = int(segment.get("sceneCount", 0))
-        if blocks != expected:
-            failures.append(f"{segment_id}: storyboard blocks {blocks} != manifest sceneCount {expected}")
+        if is_yadam:
+            # We don't parse hermes manual storyboard in yadam
+            blocks = expected
+        else:
+            blocks, storyboard_warnings = parse_storyboard_blocks(storyboard)
+            warnings.extend(f"{segment_id}: {warning}" for warning in storyboard_warnings)
+            if blocks != expected:
+                failures.append(f"{segment_id}: storyboard blocks {blocks} != manifest sceneCount {expected}")
 
-        storyboard_text = storyboard.read_text(encoding="utf-8")
-        duration_tag_count = len(re.findall(r"\bduration\s*:", storyboard_text, flags=re.IGNORECASE))
-        if duration_tag_count != expected:
-            failures.append(f"{segment_id}: storyboard duration tags {duration_tag_count} != sceneCount {expected}")
+            storyboard_text = storyboard.read_text(encoding="utf-8")
+            duration_tag_count = len(re.findall(r"\bduration\s*:", storyboard_text, flags=re.IGNORECASE))
+            if duration_tag_count != expected:
+                failures.append(f"{segment_id}: storyboard duration tags {duration_tag_count} != sceneCount {expected}")
 
         timeline = load_visual_timeline(segment_dir)
         if timeline is None:
@@ -270,45 +287,60 @@ def validate(export_dir: Path) -> dict:
                     f"{segment_id}: visual timeline scenes {len(timeline_scenes)} != manifest sceneCount {expected}"
                 )
             timeline_end = float(timeline_scenes[-1].get("endSeconds", 0)) if timeline_scenes else 0.0
-            target_duration = float(segment.get("durationSeconds", 0) or 0)
+            target_duration = float(segment.get("finalDurationSeconds" if is_yadam else "durationSeconds", 0) or 0)
             if abs(timeline_end - target_duration) > 0.01:
                 failures.append(
                     f"{segment_id}: visual timeline end {timeline_end:.3f}s != target {target_duration:.3f}s"
                 )
             if segment_id == "segment-01":
-                opening_scenes = [scene for scene in timeline_scenes if scene.get("timingBand") == "opening"]
+                opening_tag = "intro" if is_yadam else "opening"
+                opening_scenes = [scene for scene in timeline_scenes if scene.get("timingBand") == opening_tag]
                 body_scenes = [scene for scene in timeline_scenes if scene.get("timingBand") == "body"]
-                if len(opening_scenes) != 10:
-                    failures.append(f"segment-01: expected 10 opening visual scenes, got {len(opening_scenes)}")
-                for scene in opening_scenes:
-                    duration = float(scene.get("durationSeconds", 0) or 0)
-                    if duration > 6.5:
-                        failures.append(
-                            f"segment-01: opening scene {scene.get('order')} duration {duration:.3f}s exceeds 6.5s"
-                        )
-                for index, scene in enumerate(body_scenes):
-                    duration = float(scene.get("durationSeconds", 0) or 0)
-                    is_last_body_scene = index == len(body_scenes) - 1
-                    if not is_last_body_scene and duration < 20:
-                        failures.append(
-                            f"segment-01: body scene {scene.get('order')} duration {duration:.3f}s is below 20s"
-                        )
-                    if duration > 40.5:
-                        failures.append(
-                            f"segment-01: body scene {scene.get('order')} duration {duration:.3f}s exceeds 40.5s"
-                        )
+                # In yadam, we don't hardcode exactly 10 opening scenes in validate_segmented_export, as it is dynamically set
+                if not is_yadam:
+                    if len(opening_scenes) != 10:
+                        failures.append(f"segment-01: expected 10 opening visual scenes, got {len(opening_scenes)}")
+                    for scene in opening_scenes:
+                        duration = float(scene.get("durationSeconds", 0) or 0)
+                        if duration > 6.5:
+                            failures.append(
+                                f"segment-01: opening scene {scene.get('order')} duration {duration:.3f}s exceeds 6.5s"
+                            )
+                    for index, scene in enumerate(body_scenes):
+                        duration = float(scene.get("durationSeconds", 0) or 0)
+                        is_last_body_scene = index == len(body_scenes) - 1
+                        if not is_last_body_scene and duration < 20:
+                            failures.append(
+                                f"segment-01: body scene {scene.get('order')} duration {duration:.3f}s is below 20s"
+                            )
+                        if duration > 40.5:
+                            failures.append(
+                                f"segment-01: body scene {scene.get('order')} duration {duration:.3f}s exceeds 40.5s"
+                            )
+
+        # Check keyframe count for yadam
+        if is_yadam:
+            kf_manifest_path = export_dir / "compat" / "hermes" / segment_id / "keyframes" / "manifest.json"
+            if kf_manifest_path.exists():
+                kf_manifest = load_json(kf_manifest_path)
+                kf_count = len(kf_manifest.get("keyframes", []))
+                if kf_count != expected:
+                    failures.append(f"{segment_id}: keyframe count {kf_count} != visual timeline scene count {expected}")
+            else:
+                failures.append(f"{segment_id}: missing keyframe manifest {kf_manifest_path}")
 
         grounding_report = segment_dir / "visual-grounding-timeline-report.json"
-        if not grounding_report.exists():
-            warnings.append(f"{segment_id}: visual-grounding-timeline-report.json not generated yet")
-        else:
-            try:
-                grounding = json.loads(grounding_report.read_text(encoding="utf-8"))
-            except json.JSONDecodeError:
-                failures.append(f"{segment_id}: visual-grounding-timeline-report.json is not valid JSON")
+        if not is_yadam:
+            if not grounding_report.exists():
+                warnings.append(f"{segment_id}: visual-grounding-timeline-report.json not generated yet")
             else:
-                if not grounding.get("ok"):
-                    failures.append(f"{segment_id}: visual grounding timeline failed")
+                try:
+                    grounding = json.loads(grounding_report.read_text(encoding="utf-8"))
+                except json.JSONDecodeError:
+                    failures.append(f"{segment_id}: visual-grounding-timeline-report.json is not valid JSON")
+                else:
+                    if not grounding.get("ok"):
+                        failures.append(f"{segment_id}: visual grounding timeline failed")
 
         sync_report = segment_dir / "manual-assembly" / "subtitle-sync-report.json"
         assembly_report = segment_dir / "manual-assembly" / "assembly-report.json"
@@ -318,14 +350,14 @@ def validate(export_dir: Path) -> dict:
         final_duration = None
         subtitle_end = parse_srt_end_seconds(srt_path)
 
-        if sync_report.exists():
+        if sync_report.exists() and not is_yadam:
             sync = load_json(sync_report)
             if sync.get("audioSubtitleEndDeltaSeconds", 999) > 0.5:
                 failures.append(f"{segment_id}: subtitle/audio end delta > 0.5s")
             if sync.get("maxCueSeconds", 999) > 8:
                 failures.append(f"{segment_id}: maxCueSeconds > 8")
             sync_status = "present"
-        else:
+        elif not is_yadam:
             warnings.append(f"{segment_id}: subtitle-sync-report.json not generated yet")
 
         if not final_mp4.exists():
@@ -336,27 +368,46 @@ def validate(export_dir: Path) -> dict:
                 audio_tempo_factor = maybe_float(assembly.get("audioTempoFactor"))
                 if audio_tempo_factor is None:
                     warnings.append(f"{segment_id}: assembly-report audioTempoFactor missing or invalid")
-                elif audio_tempo_factor > 1.18:
-                    failures.append(
-                        f"{segment_id}: audioTempoFactor {audio_tempo_factor:.3f} exceeds 1.18"
-                    )
-                elif audio_tempo_factor < 0.92:
-                    failures.append(
-                        f"{segment_id}: audioTempoFactor {audio_tempo_factor:.3f} is below 0.92"
-                    )
+                elif is_yadam:
+                    if abs(audio_tempo_factor - 1.0) > 0.001:
+                        failures.append(f"{segment_id}: audioTempoFactor {audio_tempo_factor:.4f} != 1.0")
+                    timeline_scale = maybe_float(assembly.get("timelineScale"))
+                    if timeline_scale is None or abs(timeline_scale - 1.0) > 0.001:
+                        failures.append(f"{segment_id}: timelineScale {timeline_scale} != 1.0")
+                else:
+                    if audio_tempo_factor > 1.18:
+                        failures.append(
+                            f"{segment_id}: audioTempoFactor {audio_tempo_factor:.3f} exceeds 1.18"
+                        )
+                    elif audio_tempo_factor < 0.92:
+                        failures.append(
+                            f"{segment_id}: audioTempoFactor {audio_tempo_factor:.3f} is below 0.92"
+                        )
                 failures.extend(validate_visual_motion_groups(segment_id, assembly, assembly_report.parent))
             else:
                 warnings.append(f"{segment_id}: assembly-report.json not generated yet")
             ready_final_paths.append(final_mp4)
             final_duration = ffprobe_duration(final_mp4)
             total_ready_duration += final_duration
-            target_duration = float(segment.get("durationSeconds", 0) or 0)
-            if target_duration and abs(final_duration - target_duration) > max(15.0, target_duration * 0.08):
-                warnings.append(
-                    f"{segment_id}: final duration {final_duration:.3f}s differs from target {target_duration:.3f}s"
-                )
+            target_duration = float(segment.get("finalDurationSeconds" if is_yadam else "durationSeconds", 0) or 0)
+            if target_duration:
+                if is_yadam:
+                    if abs(final_duration - target_duration) > 0.05:
+                        failures.append(
+                            f"{segment_id}: final duration {final_duration:.3f}s differs from target {target_duration:.3f}s by > 0.05s"
+                        )
+                else:
+                    if abs(final_duration - target_duration) > max(15.0, target_duration * 0.08):
+                        warnings.append(
+                            f"{segment_id}: final duration {final_duration:.3f}s differs from target {target_duration:.3f}s"
+                        )
             if subtitle_end is None:
                 warnings.append(f"{segment_id}: subtitles.srt missing or unparseable")
+            elif is_yadam:
+                if abs(final_duration - subtitle_end) > 0.75:
+                    failures.append(
+                        f"{segment_id}: final duration {final_duration:.3f}s != subtitle end {subtitle_end:.3f}s"
+                    )
             elif abs(final_duration - subtitle_end) > 0.75:
                 failures.append(
                     f"{segment_id}: final duration {final_duration:.3f}s != subtitle end {subtitle_end:.3f}s"
@@ -404,6 +455,7 @@ def validate(export_dir: Path) -> dict:
         "readyFinalCount": len(ready_final_paths),
         "totalReadyDurationSeconds": total_ready_duration,
         "segments": segment_reports,
+        "profileId": manifest.get("profileId")
     }
 
 
@@ -420,6 +472,10 @@ def main() -> int:
         encoding="utf-8",
     )
     print(f"Segmented export validation: {report['status']}")
+    
+    is_yadam = report.get("profileId") == "yadam"
+    if is_yadam:
+        return 0 if report["status"] == "pass" else 1
     return 0 if report["status"] in {"pass", "warn"} else 1
 
 

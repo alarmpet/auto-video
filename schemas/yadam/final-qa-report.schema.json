@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://auto-video.local/schemas/yadam/final-qa-report.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "reportType",
+    "jobId",
+    "qualityOk",
+    "finalVerdict",
+    "checks",
+    "failures",
+    "warnings",
+    "artifactHashes",
+    "measuredDurationSeconds",
+    "successEvidenceInput"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "reportType": { "const": "final_qa" },
+    "jobId": { "type": "string" },
+    "qualityOk": { "type": "boolean" },
+    "finalVerdict": { "enum": ["pass", "fail"] },
+    "checks": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["status", "actual", "limit"],
+        "properties": {
+          "status": { "enum": ["pass", "fail"] },
+          "actual": {},
+          "limit": {}
+        }
+      }
+    },
+    "failures": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "warnings": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "artifactHashes": {
+      "type": "object",
+      "additionalProperties": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+    },
+    "measuredDurationSeconds": { "type": "number", "minimum": 0 },
+    "successEvidenceInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stage", "inputArtifacts", "opaqueInputs", "inputHash"],
+      "properties": {
+        "stage": { "const": "FINAL_QA_PASSED" },
+        "inputArtifacts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["artifactId", "logicalRole", "path", "sha256"],
+            "properties": {
+              "artifactId": { "type": "string" },
+              "logicalRole": { "type": "string" },
+              "path": { "type": "string" },
+              "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+            }
+          }
+        },
+        "opaqueInputs": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["profileHash", "ffmpegVersionHash", "assemblerPolicyHash", "qaPolicyHash"],
+          "properties": {
+            "profileHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+            "ffmpegVersionHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+            "assemblerPolicyHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+            "qaPolicyHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+          }
+        },
+        "inputHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+      }
+    },
+    "acknowledgedNotices": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  }
+}

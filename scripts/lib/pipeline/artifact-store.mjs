@@ -94,7 +94,7 @@ export async function registerArtifact(jobDir, record) {
 
     manifest.artifacts.push(newArtifact);
 
-    const workspaceRoot = dirname(dirname(resolve(jobDir)));
+    const workspaceRoot = resolve(process.cwd());
     const schemaPath = join(workspaceRoot, "schemas", "pipeline", "artifact-manifest.schema.json");
     await validateSchema(schemaPath, manifest);
 

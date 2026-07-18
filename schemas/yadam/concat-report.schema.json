@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://auto-video.local/schemas/yadam/concat-report.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "reportType",
+    "profileId",
+    "jobId",
+    "segmentManifestPath",
+    "segmentManifestHash",
+    "segments",
+    "streamFingerprint",
+    "ffmpegArgs",
+    "candidates",
+    "subtitleMerge"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "reportType": { "const": "yadam_concat" },
+    "profileId": { "const": "yadam" },
+    "jobId": { "type": "string" },
+    "segmentManifestPath": { "type": "string", "pattern": "^(?!\\/)(?!.*\\\\)(?!.*:)(?!.*\\.\\.)[a-zA-Z0-9_\\-\\/\\.]+$" },
+    "segmentManifestHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "segments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "segmentId",
+          "finalPath",
+          "finalSha256",
+          "finalDurationSeconds",
+          "srtPath",
+          "srtHash"
+        ],
+        "properties": {
+          "segmentId": { "type": "string" },
+          "finalPath": { "type": "string", "pattern": "^(?!\\/)(?!.*\\\\)(?!.*:)(?!.*\\.\\.)[a-zA-Z0-9_\\-\\/\\.]+$" },
+          "finalSha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "finalDurationSeconds": { "type": "number", "minimum": 0 },
+          "srtPath": { "type": "string", "pattern": "^(?!\\/)(?!.*\\\\)(?!.*:)(?!.*\\.\\.)[a-zA-Z0-9_\\-\\/\\.]+$" },
+          "srtHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+        }
+      }
+    },
+    "streamFingerprint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["videoCodec", "pixFmt", "width", "height", "fps", "audioCodec", "sampleRate"],
+      "properties": {
+        "videoCodec": { "type": "string" },
+        "pixFmt": { "type": "string" },
+        "width": { "const": 1920 },
+        "height": { "const": 1080 },
+        "fps": { "const": 24 },
+        "audioCodec": { "type": "string" },
+        "sampleRate": { "const": 48000 }
+      }
+    },
+    "ffmpegArgs": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "candidates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["concatList", "finalVideo", "uploadSubtitle"],
+      "properties": {
+        "concatList": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["path", "sha256"],
+          "properties": {
+            "path": { "const": "final/concat-list.txt" },
+            "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+          }
+        },
+        "finalVideo": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["path", "sha256"],
+          "properties": {
+            "path": { "const": "final/final-full.mp4" },
+            "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+          }
+        },
+        "uploadSubtitle": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["path", "sha256"],
+          "properties": {
+            "path": { "const": "final/upload-subtitles/final-full.upload.srt" },
+            "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+          }
+        }
+      }
+    },
+    "subtitleMerge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mergedCueCount", "missingSrt", "unparseableSrt", "timingWarnings"],
+      "properties": {
+        "mergedCueCount": { "type": "integer", "minimum": 1 },
+        "missingSrt": { "type": "array", "maxItems": 0 },
+        "unparseableSrt": { "type": "array", "maxItems": 0 },
+        "timingWarnings": { "type": "array", "maxItems": 0 }
+      }
+    }
+  }
+}

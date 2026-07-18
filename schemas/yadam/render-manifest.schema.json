@@ -1,0 +1,260 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://auto-video.local/schemas/yadam/render-manifest.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "profileId",
+    "jobId",
+    "approvalRevisionPath",
+    "width",
+    "height",
+    "fps",
+    "audioTempoFactor",
+    "plannedDurationSeconds",
+    "measuredAudioSeconds",
+    "renderDurationSeconds",
+    "script",
+    "dependencies",
+    "coverage",
+    "subtitleSetHash",
+    "scenes",
+    "visualSlots",
+    "subtitleCues",
+    "segments",
+    "introSceneIds",
+    "introVisualSlotIds",
+    "thumbnail"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "profileId": { "const": "yadam" },
+    "jobId": { "type": "string" },
+    "approvalRevisionPath": { "type": "string" },
+    "width": { "const": 1920 },
+    "height": { "const": 1080 },
+    "fps": { "const": 24 },
+    "audioTempoFactor": { "const": 1 },
+    "plannedDurationSeconds": { "type": "number", "minimum": 0 },
+    "measuredAudioSeconds": { "type": "number", "minimum": 0 },
+    "renderDurationSeconds": { "type": "number", "minimum": 0 },
+    "script": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["scenesPath", "scenesHash", "finalTextPath", "finalTextHash"],
+      "properties": {
+        "scenesPath": { "type": "string", "minLength": 1 },
+        "scenesHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "finalTextPath": { "type": "string", "minLength": 1 },
+        "finalTextHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+      }
+    },
+    "dependencies": {
+      "type": "object",
+      "additionalProperties": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+    },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["audio", "visual", "subtitle"],
+      "properties": {
+        "audio": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["path", "sha256", "revision"],
+          "properties": {
+            "path": { "type": "string", "minLength": 1 },
+            "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+            "revision": { "type": "integer", "minimum": 1 }
+          }
+        },
+        "visual": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["path", "sha256", "revision"],
+          "properties": {
+            "path": { "type": "string", "minLength": 1 },
+            "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+            "revision": { "type": "integer", "minimum": 1 }
+          }
+        },
+        "subtitle": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["path", "sha256", "revision"],
+          "properties": {
+            "path": { "type": "string", "minLength": 1 },
+            "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+            "revision": { "type": "integer", "minimum": 1 }
+          }
+        }
+      }
+    },
+    "subtitleSetHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "scenes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "sceneId",
+          "segmentId",
+          "order",
+          "sourceHash",
+          "normalizedWavPath",
+          "normalizedWavHash",
+          "durationSeconds",
+          "startSeconds",
+          "endSeconds"
+        ],
+        "properties": {
+          "sceneId": { "type": "string", "minLength": 1 },
+          "segmentId": { "type": "string", "minLength": 1 },
+          "order": { "type": "integer", "minimum": 1 },
+          "sourceHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "normalizedWavPath": { "type": "string", "minLength": 1 },
+          "normalizedWavHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "durationSeconds": { "type": "number", "exclusiveMinimum": 0 },
+          "startSeconds": { "type": "number", "minimum": 0 },
+          "endSeconds": { "type": "number", "minimum": 0 }
+        }
+      }
+    },
+    "visualSlots": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "visualSlotId",
+          "visualOrder",
+          "segmentId",
+          "sourceSceneIds",
+          "primarySceneId",
+          "startSeconds",
+          "endSeconds",
+          "durationSeconds",
+          "timingBand",
+          "extendedHold",
+          "holdReason",
+          "purpose",
+          "imagePath",
+          "imageSha256",
+          "qaStatus",
+          "provider",
+          "model",
+          "workflowPath",
+          "workflowHash",
+          "checkpointHash",
+          "seed",
+          "generationAttempt"
+        ],
+        "properties": {
+          "visualSlotId": { "type": "string", "minLength": 1 },
+          "visualOrder": { "type": "integer", "minimum": 1 },
+          "segmentId": { "type": "string", "minLength": 1 },
+          "sourceSceneIds": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "type": "string" }
+          },
+          "primarySceneId": { "type": "string", "minLength": 1 },
+          "startSeconds": { "type": "number", "minimum": 0 },
+          "endSeconds": { "type": "number", "minimum": 0 },
+          "durationSeconds": { "type": "number", "minimum": 0 },
+          "timingBand": { "enum": ["intro", "body"] },
+          "extendedHold": { "type": "boolean" },
+          "holdReason": { "type": ["string", "null"] },
+          "purpose": { "type": "string" },
+          "imagePath": { "type": "string", "minLength": 1 },
+          "imageSha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "qaStatus": { "const": "pass" },
+          "provider": { "type": "string" },
+          "model": { "type": "string" },
+          "workflowPath": { "type": "string" },
+          "workflowHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "checkpointHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "seed": { "type": "integer" },
+          "generationAttempt": { "type": "integer" }
+        }
+      }
+    },
+    "subtitleCues": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "cueId",
+          "segmentId",
+          "sceneIds",
+          "startSeconds",
+          "endSeconds",
+          "durationSeconds",
+          "text",
+          "sourceHashes"
+        ],
+        "properties": {
+          "cueId": { "type": "string" },
+          "segmentId": { "type": "string" },
+          "sceneIds": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "type": "string" }
+          },
+          "startSeconds": { "type": "number", "minimum": 0 },
+          "endSeconds": { "type": "number", "minimum": 0 },
+          "durationSeconds": { "type": "number", "exclusiveMinimum": 0 },
+          "text": { "type": "string", "minLength": 1 },
+          "sourceHashes": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+          }
+        }
+      }
+    },
+    "segments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "segmentId",
+          "plannedDurationSeconds",
+          "measuredAudioSeconds",
+          "startSeconds",
+          "endSeconds"
+        ],
+        "properties": {
+          "segmentId": { "type": "string", "minLength": 1 },
+          "plannedDurationSeconds": { "type": "number", "minimum": 0 },
+          "measuredAudioSeconds": { "type": "number", "minimum": 0 },
+          "startSeconds": { "type": "number", "minimum": 0 },
+          "endSeconds": { "type": "number", "minimum": 0 }
+        }
+      }
+    },
+    "introSceneIds": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "introVisualSlotIds": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "thumbnail": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "qaPath", "qaSha256", "qaStatus"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "qaPath": { "type": "string", "minLength": 1 },
+        "qaSha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "qaStatus": { "const": "pass" }
+      }
+    }
+  }
+}

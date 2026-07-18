@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://auto-video.local/schemas/yadam/segment-manifest.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "profileId",
+    "renderManifestPath",
+    "renderManifestHash",
+    "fps",
+    "segments"
+  ],
+  "properties": {
+    "profileId": { "const": "yadam" },
+    "renderManifestPath": { "type": "string", "pattern": "^(?!\\/)(?!.*\\\\)(?!.*:)(?!.*\\.\\.)[a-zA-Z0-9_\\-\\/\\.]+$" },
+    "renderManifestHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "fps": { "const": 24 },
+    "segments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "segmentId",
+          "plannedDurationSeconds",
+          "measuredAudioSeconds",
+          "renderDurationSeconds",
+          "finalDurationSeconds",
+          "cumulativeStartSeconds",
+          "cumulativeEndSeconds",
+          "dir",
+          "finalPath",
+          "finalSha256",
+          "qaPath",
+          "qaSha256"
+        ],
+        "properties": {
+          "segmentId": { "type": "string" },
+          "plannedDurationSeconds": { "type": "number", "minimum": 0 },
+          "measuredAudioSeconds": { "type": "number", "minimum": 0 },
+          "renderDurationSeconds": { "type": "number", "minimum": 0 },
+          "finalDurationSeconds": { "type": "number", "minimum": 0 },
+          "cumulativeStartSeconds": { "type": "number", "minimum": 0 },
+          "cumulativeEndSeconds": { "type": "number", "minimum": 0 },
+          "dir": { "type": "string", "pattern": "^(?!\\/)(?!.*\\\\)(?!.*:)(?!.*\\.\\.)[a-zA-Z0-9_\\-\\/\\.]+$" },
+          "finalPath": { "type": "string", "pattern": "^(?!\\/)(?!.*\\\\)(?!.*:)(?!.*\\.\\.)[a-zA-Z0-9_\\-\\/\\.]+$" },
+          "finalSha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "qaPath": { "type": "string", "pattern": "^(?!\\/)(?!.*\\\\)(?!.*:)(?!.*\\.\\.)[a-zA-Z0-9_\\-\\/\\.]+$" },
+          "qaSha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://auto-video.local/schemas/yadam/hermes-compatibility.schema.json",
+  "oneOf": [
+    { "$ref": "#/$defs/scenePlan" },
+    { "$ref": "#/$defs/keyframesManifest" },
+    { "$ref": "#/$defs/visualTimeline" }
+  ],
+  "$defs": {
+    "scenePlan": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["order", "scene_id", "narration", "video_prompt", "duration_seconds"],
+        "properties": {
+          "order": { "type": "integer", "minimum": 1 },
+          "scene_id": { "type": "string" },
+          "narration": { "type": "string" },
+          "video_prompt": { "type": "string" },
+          "duration_seconds": { "type": "number", "exclusiveMinimum": 0 }
+        }
+      }
+    },
+    "keyframesManifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["keyframes"],
+      "properties": {
+        "keyframes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["visualOrder", "visualSlotId", "output_path", "narration_refs", "prompt", "image_sha256"],
+            "properties": {
+              "visualOrder": { "type": "integer", "minimum": 1 },
+              "visualSlotId": { "type": "string" },
+              "output_path": { "type": "string" },
+              "narration_refs": {
+                "type": "array",
+                "items": { "type": "integer" }
+              },
+              "prompt": { "type": "string" },
+              "image_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+            }
+          }
+        }
+      }
+    },
+    "visualTimeline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "profileId",
+        "segmentId",
+        "plannedDurationSeconds",
+        "measuredAudioSeconds",
+        "renderDurationSeconds",
+        "durationSeconds",
+        "scenes"
+      ],
+      "properties": {
+        "schemaVersion": { "const": "1.0.0" },
+        "profileId": { "const": "yadam" },
+        "segmentId": { "type": "string" },
+        "plannedDurationSeconds": { "type": "number", "minimum": 0 },
+        "measuredAudioSeconds": { "type": "number", "minimum": 0 },
+        "renderDurationSeconds": { "type": "number", "minimum": 0 },
+        "durationSeconds": { "type": "number", "minimum": 0 },
+        "scenes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "order",
+              "visualOrder",
+              "visualSlotId",
+              "sourceSceneIds",
+              "primarySceneId",
+              "startSeconds",
+              "endSeconds",
+              "durationSeconds",
+              "timingBand",
+              "extendedHold",
+              "holdReason"
+            ],
+            "properties": {
+              "order": { "type": "integer", "minimum": 1 },
+              "visualOrder": { "type": "integer", "minimum": 1 },
+              "visualSlotId": { "type": "string" },
+              "sourceSceneIds": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "primarySceneId": { "type": "string" },
+              "startSeconds": { "type": "number", "minimum": 0 },
+              "endSeconds": { "type": "number", "minimum": 0 },
+              "durationSeconds": { "type": "number", "minimum": 0 },
+              "timingBand": { "enum": ["intro", "body"] },
+              "extendedHold": { "type": "boolean" },
+              "holdReason": { "type": ["string", "null"] }
+            }
+          }
+        }
+      }
+    }
+  }
+}

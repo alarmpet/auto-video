@@ -118,11 +118,12 @@ export function buildKenBurnsFilter({
   zoomAmount = zoomAmountForDuration(durationSeconds),
   forceMonochrome = true,
   upscale = 2,
+  frameCount = null,
 } = {}) {
   const safeFps = Math.max(1, Math.round(Number(fps) || 24));
   const safeDuration = Math.max(0.1, Number(durationSeconds) || 8);
   const safeUpscale = Math.max(1, Math.round(Number(upscale) || 2));
-  const frames = Math.max(1, Math.round(safeDuration * safeFps));
+  const frames = frameCount ? Math.max(1, Math.round(Number(frameCount))) : Math.max(1, Math.round(safeDuration * safeFps));
   const expr = motionExpressions({ move, zoomAmount, frames });
   const parts = [
     `scale=${width * safeUpscale}:${height * safeUpscale}:force_original_aspect_ratio=increase:flags=lanczos`,

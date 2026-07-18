@@ -2,6 +2,8 @@
 import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { loadVerifiedRenderManifest } from "./lib/yadam/render-manifest.mjs";
+import { compileFinalConcat } from "./lib/yadam/concat-service.mjs";
 
 const args = parseArgs(process.argv.slice(2));
 const exportDir = args.exportDir;
@@ -14,6 +16,58 @@ const manifest = JSON.parse(readFileSync(join(exportDir, "segment-manifest.json"
 if (!Array.isArray(manifest.segments) || !manifest.segments.length) {
   throw new Error("segment-manifest.json must contain a non-empty segments array");
 }
+
+if (manifest.profileId === "yadam") {
+  const verifiedManifest = await loadVerifiedRenderManifest(exportDir);
+  const result = await compileFinalConcat({ jobDir: exportDir, renderManifest: verifiedManifest });
+  
+  const finalQaData = JSON.parse(readFileSync(join(exportDir, "final/final-qa-report.json"), "utf8"));
+  const fingerprint = finalQaData.checks?.video_profile?.actual || {};
+
+  const finalSrtContent = readFileSync(join(exportDir, result.uploadSubtitle.path), "utf8");
+  const srtCues = parseSrt(finalSrtContent);
+
+  // Write concat report
+  const report = {
+    schemaVersion: "1.0.0",
+    reportType: "yadam_concat",
+    profileId: "yadam",
+    jobId: manifest.jobId,
+    segmentManifestPath: "segment-manifest.json",
+    segmentManifestHash: sha256Bytes(readFileSync(join(exportDir, "segment-manifest.json"))),
+    segments: manifest.segments.map(seg => ({
+      segmentId: seg.segmentId,
+      finalPath: seg.finalPath,
+      finalSha256: seg.finalSha256,
+      finalDurationSeconds: seg.finalDurationSeconds,
+      srtPath: `compat/hermes/${seg.segmentId}/subtitles.srt`,
+      srtHash: sha256Bytes(readFileSync(join(exportDir, `compat/hermes/${seg.segmentId}/subtitles.srt`)))
+    })),
+    streamFingerprint: fingerprint,
+    ffmpegArgs: ["-c", "copy"],
+    candidates: {
+      concatList: result.concatList,
+      finalVideo: result.finalVideo,
+      uploadSubtitle: result.uploadSubtitle
+    },
+    subtitleMerge: {
+      mergedCueCount: srtCues.length,
+      missingSrt: [],
+      unparseableSrt: [],
+      timingWarnings: []
+    }
+  };
+  
+  // Register artifact
+  const concatReportPath = join(exportDir, "final/concat-report.json");
+  writeFileSync(concatReportPath, JSON.stringify(report, null, 2), "utf8");
+  
+  console.log(JSON.stringify(result, null, 2));
+  process.exit(0);
+}
+
+import { sha256Bytes } from "./lib/pipeline/canonical-json.mjs";
+
 
 const finalDir = join(exportDir, "final");
 mkdirSync(finalDir, { recursive: true });

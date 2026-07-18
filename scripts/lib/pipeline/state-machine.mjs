@@ -179,7 +179,7 @@ export async function transitionJob(jobDir, event) {
     state.status = newStatus;
     state.history.push(newRow);
 
-    const workspaceRoot = dirname(dirname(resolve(jobDir)));
+    const workspaceRoot = resolve(process.cwd());
     const schemaPath = join(workspaceRoot, "schemas", "pipeline", "pipeline-state.schema.json");
 
     await validateSchema(schemaPath, state);

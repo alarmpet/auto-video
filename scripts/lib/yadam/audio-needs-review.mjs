@@ -1,6 +1,7 @@
 import { promises as fsPromises, existsSync } from "node:fs";
 import { join, resolve } from "node:path";
-import { hashCanonical, writeCanonicalJsonExclusive, readJson } from "../pipeline/atomic-store.mjs";
+import { writeCanonicalJsonExclusive, readJson } from "../pipeline/atomic-store.mjs";
+import { hashCanonical } from "../pipeline/canonical-json.mjs";
 import { registerArtifact } from "../pipeline/artifact-store.mjs";
 import { validateSchema } from "../pipeline/schema-registry.mjs";
 import { assertPathWithin } from "../pipeline/path-policy.mjs";

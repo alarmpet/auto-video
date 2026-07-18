@@ -123,6 +123,8 @@ export async function loadJob(jobDir) {
   const manifest = await readJson(join(resolvedDir, "artifact-manifest.json"));
   return {
     jobDir: resolvedDir,
+    jobId: state.jobId || request.jobId,
+    workspaceRoot: resolve(resolvedDir, "..", ".."),
     request,
     state,
     manifest

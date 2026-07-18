@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://auto-video.local/schemas/yadam/assembly-report.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "profileId",
+    "options",
+    "measuredAudioSeconds",
+    "timelineScale",
+    "audioTempoFactor",
+    "finalStreamEvidence",
+    "visualGroups"
+  ],
+  "properties": {
+    "profileId": { "const": "yadam" },
+    "options": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["finalName", "preserveAudioTempo", "motionFps", "preserveColor"],
+      "properties": {
+        "finalName": { "type": "string" },
+        "preserveAudioTempo": { "const": true },
+        "motionFps": { "const": 24 },
+        "preserveColor": { "const": true }
+      }
+    },
+    "measuredAudioSeconds": { "type": "number", "minimum": 0 },
+    "timelineScale": { "const": 1 },
+    "audioTempoFactor": { "const": 1 },
+    "finalStreamEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["videoCodec", "pixFmt", "width", "height", "fps", "audioCodec", "sampleRate"],
+      "properties": {
+        "videoCodec": { "type": "string" },
+        "pixFmt": { "type": "string" },
+        "width": { "const": 1920 },
+        "height": { "const": 1080 },
+        "fps": { "const": 24 },
+        "audioCodec": { "type": "string" },
+        "sampleRate": { "const": 48000 }
+      }
+    },
+    "visualGroups": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "visualSlotId",
+          "manifestStart",
+          "manifestEnd",
+          "manifestDuration",
+          "actualFrameStart",
+          "actualFrameEnd",
+          "actualFrameDuration",
+          "frameCount",
+          "timelineScale",
+          "imageHash",
+          "motion",
+          "colorMode",
+          "clip"
+        ],
+        "properties": {
+          "visualSlotId": { "type": "string" },
+          "manifestStart": { "type": "number", "minimum": 0 },
+          "manifestEnd": { "type": "number", "minimum": 0 },
+          "manifestDuration": { "type": "number", "minimum": 0 },
+          "actualFrameStart": { "type": "integer", "minimum": 0 },
+          "actualFrameEnd": { "type": "integer", "minimum": 0 },
+          "actualFrameDuration": { "type": "number", "minimum": 0 },
+          "frameCount": { "type": "integer", "minimum": 1 },
+          "timelineScale": { "const": 1 },
+          "imageHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "motion": { "type": "string" },
+          "colorMode": { "type": "string" },
+          "clip": { "type": "string" }
+        }
+      }
+    }
+  }
+}

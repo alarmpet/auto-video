@@ -59,7 +59,7 @@ async function withImageMutationLock({ jobDir, ownerStage, signal }, fn) {
 }
 
 function resolvePassedArtifactByRole(job, logicalRole) {
-  const record = job.state.artifacts?.find(a => a.logicalRole === logicalRole && a.gateStatus === "pass");
+  const record = job.manifest.artifacts?.find(a => a.logicalRole === logicalRole && a.gateStatus === "pass");
   if (!record) {
     throw Object.assign(new Error(`missing passed artifact for logical role: ${logicalRole}`), { code: "artifact_missing" });
   }

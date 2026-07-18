@@ -56,25 +56,65 @@ for (const mp4 of mp4Files) {
   }
 }
 
+// Load manifest to detect yadam profile
+const manifestPath = join(args.exportDir, "segment-manifest.json");
+const isYadam = existsSync(manifestPath) && JSON.parse(readFileSync(manifestPath, "utf8")).profileId === "yadam";
+
+if (isYadam) {
+  const coveragePath = join(args.exportDir, "script/coverage-report.json");
+  if (!existsSync(coveragePath)) {
+    failures.push({
+      type: "missing_coverage_report",
+      fix: "Ensure subtitle coverage is generated before running QA checks.",
+    });
+  } else {
+    const coverage = JSON.parse(readFileSync(coveragePath, "utf8"));
+    if (coverage.sections?.subtitle !== "pass") {
+      failures.push({
+        type: "subtitle_coverage_mismatch",
+        fix: "Fix subtitle coverage discrepancies.",
+      });
+    }
+  }
+}
+
 // 2-4. Cue integrity for every SRT in the export.
 const srtReports = [];
 for (const srtPath of srtFiles) {
-  const cues = parseSrt(readFileSync(srtPath, "utf8"));
+  const content = readFileSync(srtPath, "utf8");
+  const cues = parseSrt(content);
+  
+  if (isYadam && (!cues || cues.length === 0)) {
+    failures.push({ type: "empty_or_unparseable_srt", srtPath, fix: "Ensure SRT is populated and syntactically valid." });
+    continue;
+  }
+
   const zeroCues = [];
   const overlaps = [];
   const inverted = [];
+  const maxCues = [];
+
   for (let i = 0; i < cues.length; i += 1) {
     const cue = cues[i];
+    const dur = cue.end - cue.start;
+    
     if (cue.end < cue.start - 0.001) inverted.push(describe(cue, i));
-    else if (cue.end - cue.start < minCueSeconds) zeroCues.push(describe(cue, i));
+    else if (dur < minCueSeconds) zeroCues.push(describe(cue, i));
+    
+    if (isYadam && dur > 8.001) {
+      maxCues.push(describe(cue, i));
+    }
+    
     if (i > 0 && cue.start < cues[i - 1].end - 0.001) {
       overlaps.push({ previous: describe(cues[i - 1], i - 1), next: describe(cue, i) });
     }
   }
+  
   srtReports.push({ srtPath, cueCount: cues.length, zeroCues: zeroCues.length, overlaps: overlaps.length, inverted: inverted.length });
   if (inverted.length) failures.push({ type: "inverted_cues", srtPath, samples: inverted.slice(0, 5) });
   if (overlaps.length) failures.push({ type: "overlapping_cues", srtPath, count: overlaps.length, samples: overlaps.slice(0, 5) });
   if (zeroCues.length) failures.push({ type: "zero_duration_cues", srtPath, count: zeroCues.length, samples: zeroCues.slice(0, 5) });
+  if (maxCues.length) failures.push({ type: "max_duration_exceeded", srtPath, count: maxCues.length, samples: maxCues.slice(0, 5) });
 }
 
 const report = {

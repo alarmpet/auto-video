@@ -17,10 +17,14 @@ const warnings = [];
 const segments = [];
 let checkedCount = 0;
 
+const isYadam = manifest.profileId === "yadam";
+
 for (const segment of manifest.segments || []) {
-  const reportPath = join(segment.dir, "manual-assembly", "assembly-report.json");
+  const segId = isYadam ? segment.segmentId : segment.id;
+  const segmentDir = isYadam ? join(exportDir, segment.dir) : segment.dir;
+  const reportPath = join(segmentDir, "manual-assembly", "assembly-report.json");
   if (!existsSync(reportPath)) {
-    warnings.push(`${segment.id}: missing assembly-report.json`);
+    warnings.push(`${segId}: missing assembly-report.json`);
     continue;
   }
 
@@ -29,18 +33,24 @@ for (const segment of manifest.segments || []) {
   const factor = Number(report.audioTempoFactor || 1);
   const raw = Number(report.rawVoiceSeconds || report.totalVoiceSeconds || 0);
   const final = Number(report.totalVoiceSeconds || 0);
-  const target = Number(segment.durationSeconds || 0);
+  const target = isYadam ? Number(segment.finalDurationSeconds || 0) : Number(segment.durationSeconds || 0);
 
   segments.push({
-    id: segment.id,
+    id: segId,
     rawVoiceSeconds: raw,
     finalVoiceSeconds: final,
     targetSeconds: target,
     audioTempoFactor: factor,
   });
 
-  if (factor > 1.18) failures.push(`${segment.id}: audioTempoFactor ${factor.toFixed(3)} is too fast`);
-  if (factor < 0.92) failures.push(`${segment.id}: audioTempoFactor ${factor.toFixed(3)} is too slow`);
+  if (isYadam) {
+    if (Math.abs(factor - 1) > 0.001) {
+      failures.push(`${segId}: audioTempoFactor ${factor.toFixed(4)} deviates from 1.0 by more than 0.001`);
+    }
+  } else {
+    if (factor > 1.18) failures.push(`${segId}: audioTempoFactor ${factor.toFixed(3)} is too fast`);
+    if (factor < 0.92) failures.push(`${segId}: audioTempoFactor ${factor.toFixed(3)} is too slow`);
+  }
 }
 
 if (checkedCount === 0) failures.push("no rendered segment assembly-report.json files found");

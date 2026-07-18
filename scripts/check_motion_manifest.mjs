@@ -32,21 +32,39 @@ for (let index = 1; index < motions.length; index += 1) {
 }
 if (groups.length >= 10 && unique.size < 5) failures.push(`motion_variety_too_low:${unique.size}<5`);
 
+const isYadam = report.profileId === "yadam";
+
 for (const [index, group] of groups.entries()) {
   const oneBased = index + 1;
-  const duration = Number(group.duration);
+  const duration = Number(group.duration || group.actualFrameDuration);
   const fps = Number(group.fps);
   const zoomAmount = Number(group.zoomAmount);
   const effectiveZoom = Number(group.effectiveZoom);
 
+  if (isYadam) {
+    if (!group.visualSlotId) failures.push(`missing_visualSlotId:${oneBased}`);
+    if (Number(group.timelineScale) !== 1) failures.push(`invalid_timelineScale:${oneBased}`);
+    
+    const mStart = Number(group.manifestStart);
+    const mEnd = Number(group.manifestEnd);
+    const aStart = Number(group.actualFrameStart) / fps;
+    const aEnd = Number(group.actualFrameEnd) / fps;
+    
+    if (Math.abs(mStart - aStart) > 1/fps + 0.001 || Math.abs(mEnd - aEnd) > 1/fps + 0.001) {
+      failures.push(`boundary_error_exceeds_one_frame:${oneBased}`);
+    }
+  }
+
   if (!Number.isFinite(duration) || duration <= 0) failures.push(`invalid_duration:${oneBased}`);
   if (!Number.isFinite(fps) || fps <= 0) failures.push(`invalid_fps:${oneBased}`);
-  if (!Number.isFinite(zoomAmount) || zoomAmount <= 0 || zoomAmount > 0.12) failures.push(`invalid_zoom_amount:${oneBased}`);
-  if (!Number.isFinite(effectiveZoom) || effectiveZoom <= 0 || effectiveZoom > 0.12) failures.push(`invalid_effective_zoom:${oneBased}`);
-  if (group.travelZoom !== null && group.travelZoom !== undefined) {
-    const travelZoom = Number(group.travelZoom);
-    if (!Number.isFinite(travelZoom) || travelZoom <= 0 || travelZoom > 0.12) {
-      failures.push(`invalid_travel_zoom:${oneBased}`);
+  if (!isYadam) {
+    if (!Number.isFinite(zoomAmount) || zoomAmount <= 0 || zoomAmount > 0.12) failures.push(`invalid_zoom_amount:${oneBased}`);
+    if (!Number.isFinite(effectiveZoom) || effectiveZoom <= 0 || effectiveZoom > 0.12) failures.push(`invalid_effective_zoom:${oneBased}`);
+    if (group.travelZoom !== null && group.travelZoom !== undefined) {
+      const travelZoom = Number(group.travelZoom);
+      if (!Number.isFinite(travelZoom) || travelZoom <= 0 || travelZoom > 0.12) {
+        failures.push(`invalid_travel_zoom:${oneBased}`);
+      }
     }
   }
   if (!group.clip) {
