@@ -25,9 +25,18 @@
               "required": ["slotId", "narrativeText", "visualPrompt"],
               "additionalProperties": false
             }
+          },
+          "tts": {
+            "type": "object",
+            "properties": {
+              "continuousNext": { "type": "boolean" },
+              "readSlow": { "type": "boolean" }
+            },
+            "required": ["continuousNext", "readSlow"],
+            "additionalProperties": false
           }
         },
-        "required": ["sceneId", "slots"],
+        "required": ["sceneId", "slots", "tts"],
         "additionalProperties": false
       }
     }

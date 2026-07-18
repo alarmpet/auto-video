@@ -33,7 +33,11 @@ export async function buildScenePlan({ jobDir }) {
           narrativeText: s.sourceText,
           visualPrompt: `A beautiful historical Korean painting of scene ${s.sceneId}`
         }
-      ]
+      ],
+      tts: {
+        continuousNext: idx < scenes.length - 1,
+        readSlow: false
+      }
     };
   });
 
