@@ -24,7 +24,7 @@
           "surnameId": { "type": ["string", "null"] },
           "givenNameId": { "type": "string" }
         },
-        "required": ["characterId", "name", "classId", "gender", "prominence", "description"],
+        "required": ["characterId", "name", "classId", "gender", "prominence", "description", "requiresSurname", "surnameId", "givenNameId"],
         "additionalProperties": false
       }
     },
