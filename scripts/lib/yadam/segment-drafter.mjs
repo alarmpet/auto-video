@@ -177,7 +177,7 @@ export async function draftNextSegment({ jobDir }) {
       promptPath,
       schemaPath,
       input: stageInput,
-      timeoutMs: 300000
+      timeoutMs: 480000
     });
 
     violations = checkSegmentHardGates(result.payload, plannedSegment, isFirst, isLast, hookBrief, references.beats.fixedEnding, previousSegment);
@@ -206,7 +206,7 @@ export async function draftNextSegment({ jobDir }) {
           violations: violations.sort(),
           rejectedOutputHash
         },
-        timeoutMs: 300000
+        timeoutMs: 480000
       });
       const repViolations = checkSegmentHardGates(result.payload, plannedSegment, isFirst, isLast, hookBrief, references.beats.fixedEnding, previousSegment);
       if (repViolations.length > 0) {

@@ -101,7 +101,7 @@ export async function buildStoryBible({ jobDir }) {
       promptPath,
       schemaPath,
       input: stageInput,
-      timeoutMs: 180000
+      timeoutMs: 480000
     });
 
     // Check if semantic contract matches
@@ -130,7 +130,7 @@ export async function buildStoryBible({ jobDir }) {
           violations: violations.sort(),
           rejectedOutputHash
         },
-        timeoutMs: 180000
+        timeoutMs: 480000
       });
 
       const resultContract = computeSemanticContract({ ...approval1, ...result.payload });
