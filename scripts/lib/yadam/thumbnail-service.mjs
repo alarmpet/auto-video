@@ -49,6 +49,17 @@ export async function generateThumbnailPlan({ jobDir }) {
     dependencyHashes: {}
   });
 
+  const scenesRecord = context.manifest.artifacts.find(a => a.logicalRole === "yadam.script.scenes");
+  const inputHash = scenesRecord ? scenesRecord.sha256 : "0".repeat(64);
+
+  await transitionJob(jobDir, {
+    stage: "THUMBNAIL_OPTIONS_READY",
+    to: "awaiting_approval",
+    inputHash,
+    outputHash: thumbnailPlanHash,
+    artifactPaths: ["planning/thumbnail-plan.json"]
+  });
+
   return {
     status: "awaiting_thumbnail_copy_selection",
     artifact: {
