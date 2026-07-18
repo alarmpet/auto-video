@@ -247,7 +247,7 @@ export async function generateConceptOptions({ jobDir, historyPath, now }) {
       promptPath,
       schemaPath,
       input: { conceptInputsHash, conceptInputs },
-      timeoutMs: 180000
+      timeoutMs: 480000
     });
 
     violations = checkConceptOptionsHardGates(result.payload, conceptInputs, references);
@@ -282,7 +282,7 @@ export async function generateConceptOptions({ jobDir, historyPath, now }) {
           violations: violations.sort(),
           rejectedOutputHash
         },
-        timeoutMs: 180000
+        timeoutMs: 480000
       });
 
       const repairViolations = checkConceptOptionsHardGates(result.payload, conceptInputs, references);
