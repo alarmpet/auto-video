@@ -1,6 +1,7 @@
 // scripts/lib/yadam/approval-service.mjs
 import { join, dirname, resolve } from "node:path";
 import { readFile, open, unlink, mkdir } from "node:fs/promises";
+import { existsSync } from "node:fs";
 import { loadJob } from "../pipeline/job-store.mjs";
 import { writeCanonicalJson, writeCanonicalJsonExclusive } from "../pipeline/atomic-store.mjs";
 import { registerArtifact, canReuseArtifact } from "../pipeline/artifact-store.mjs";
@@ -197,6 +198,7 @@ export async function buildApprovalOneBundle({ jobDir }) {
 
   let outlineHash;
   let outlinePayload;
+  let outlineResult = null;
 
   const outlineDependencies = {
     "hookBrief": hookBriefHash
@@ -208,8 +210,22 @@ export async function buildApprovalOneBundle({ jobDir }) {
     const bytes = await readFile(outlinePath);
     outlineHash = sha256Bytes(bytes);
     outlinePayload = JSON.parse(bytes.toString("utf8"));
+
+    // Populate outlineResult with candidate.json for provenance if available
+    const repairDir = join(jobDir, "logs/codex/yadam.outline.v1.repair-1/attempt-1/workspace");
+    const normalDir = join(jobDir, "logs/codex/yadam.outline.v1/attempt-1/workspace");
+    let candPath = join(repairDir, "candidate.json");
+    if (!existsSync(candPath)) {
+      candPath = join(normalDir, "candidate.json");
+    }
+    if (existsSync(candPath)) {
+      try {
+        outlineResult = JSON.parse(await readFile(candPath, "utf8"));
+      } catch (err) {
+        // ignore
+      }
+    }
   } else {
-    let outlineResult;
     let outlineAttempt = 1;
     let outlineViolations = [];
     let outlineRejectedHash = "0000000000000000000000000000000000000000000000000000000000000000";
@@ -333,7 +349,7 @@ export async function buildApprovalOneBundle({ jobDir }) {
       outlinePromptHash: sha256Bytes(await readFile(outlinePromptPath)),
       outlineSchemaHash: sha256Bytes(await readFile(outlineSchemaPath)),
       profileHash: context.state.profileHash || "0000000000000000000000000000000000000000000000000000000000000000",
-      codexExecutionPinHash: outlineResult.provenance ? sha256Bytes(Buffer.from(canonicalJson({
+      codexExecutionPinHash: (outlineResult && outlineResult.provenance) ? sha256Bytes(Buffer.from(canonicalJson({
         executableVersion: outlineResult.provenance.executableVersion,
         model: outlineResult.provenance.model,
         reasoningEffort: outlineResult.provenance.reasoningEffort,
