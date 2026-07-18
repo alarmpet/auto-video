@@ -238,6 +238,16 @@ async function main() {
         result
       }));
     } else if (command === "run") {
+      const job = await loadJob(args.job);
+      if (job.state.status === "pending") {
+        const reqArt = job.manifest.artifacts.find(a => a.artifactId === "pipeline-request");
+        const inputHash = reqArt ? reqArt.sha256 : "0000000000000000000000000000000000000000000000000000000000000000";
+        await transitionJob(args.job, {
+          stage: "pipeline-start",
+          to: "running",
+          inputHash
+        });
+      }
       const result = await orchestrator.runJobUntilBlocked({ jobDir: args.job });
       console.log(JSON.stringify({
         ok: true,
