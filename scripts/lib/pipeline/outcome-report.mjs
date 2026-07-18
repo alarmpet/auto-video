@@ -3,7 +3,7 @@ import { readFile, mkdir } from "node:fs/promises";
 import { join, resolve, relative } from "node:path";
 import { readJson, writeCanonicalJsonExclusive } from "./atomic-store.mjs";
 import { hashCanonical, sha256Bytes } from "./canonical-json.mjs";
-import { assertRealPathWithin } from "./path-policy.mjs";
+import { assertRealPathWithin, assertPathWithin } from "./path-policy.mjs";
 import { registerArtifact } from "./artifact-store.mjs";
 import { loadJob } from "./job-store.mjs";
 
@@ -47,7 +47,7 @@ export async function writeOutcomeReport({
   let upstreamReport = null;
   if (upstreamReportPath) {
     const resolvedUpstream = resolve(resolvedJobDir, upstreamReportPath);
-    await assertRealPathWithin(resolvedJobDir, resolvedUpstream);
+    assertPathWithin(resolvedJobDir, resolvedUpstream);
     if (existsSync(resolvedUpstream)) {
       const upstreamBytes = await readFile(resolvedUpstream);
       upstreamReport = {
@@ -69,7 +69,7 @@ export async function writeOutcomeReport({
   const shortIdentity = reportIdentityHash.slice(0, 12);
   const relativeReportPath = `reviews/outcomes/${status}-${errorCode}-${shortIdentity}.json`;
   const absoluteReportPath = resolve(resolvedJobDir, relativeReportPath);
-  await assertRealPathWithin(resolvedJobDir, absoluteReportPath);
+  assertPathWithin(resolvedJobDir, absoluteReportPath);
 
   const reportPayload = {
     schemaVersion: "1.0.0",
