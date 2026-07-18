@@ -123,7 +123,7 @@ export async function buildApprovalOneBundle({ jobDir }) {
       promptPath: introPromptPath,
       schemaPath: introSchemaPath,
       input: introStageInput,
-      timeoutMs: 120000
+      timeoutMs: 480000
     });
     introViolations = checkIntroHardGates(introResult.payload, references);
     if (introViolations.length > 0) {
@@ -150,7 +150,7 @@ export async function buildApprovalOneBundle({ jobDir }) {
         violations: introViolations.sort(),
         rejectedOutputHash: introRejectedHash
       },
-      timeoutMs: 120000
+      timeoutMs: 480000
     });
     const repViolations = checkIntroHardGates(introResult.payload, references);
     if (repViolations.length > 0) {
@@ -198,7 +198,7 @@ export async function buildApprovalOneBundle({ jobDir }) {
       promptPath: outlinePromptPath,
       schemaPath: outlineSchemaPath,
       input: outlineStageInput,
-      timeoutMs: 180000
+      timeoutMs: 480000
     });
     outlineViolations = checkOutlineHardGates(outlineResult.payload, references);
     if (outlineViolations.length > 0) {
@@ -225,7 +225,7 @@ export async function buildApprovalOneBundle({ jobDir }) {
         violations: outlineViolations.sort(),
         rejectedOutputHash: outlineRejectedHash
       },
-      timeoutMs: 180000
+      timeoutMs: 480000
     });
     const repViolations = checkOutlineHardGates(outlineResult.payload, references);
     if (repViolations.length > 0) {
