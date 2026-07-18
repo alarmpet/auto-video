@@ -290,6 +290,8 @@ export async function generateConceptOptions({ jobDir, historyPath, now }) {
         throw new Error(`Repair hard gate validation failed: ${repairViolations.join(", ")}`);
       }
     } catch (repairErr) {
+      console.error("DEBUG CODEX FIRST ERR:", lastError);
+      console.error("DEBUG CODEX REPAIR ERR:", repairErr);
       await transitionJob(jobDir, {
         stage: "yadam.concept.options.v1",
         to: "needs_review",

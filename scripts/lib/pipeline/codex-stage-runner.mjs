@@ -45,7 +45,7 @@ export async function runCodexStage({ jobDir, stageId, prompt, schemaPath, input
   const stderrPath = resolve(join(stageWorkDir, "stderr.log"));
 
   const args = [
-    "exec", "-a", "never", "-s", "read-only", "--json",
+    "exec", "-s", "read-only", "--json",
     "--model", "gpt-5.6-sol", "-c", "model_reasoning_effort=\"ultra\"",
     "-C", stageWorkDir, "-c", "project_root_markers=[]",
     "--ignore-user-config", "--ignore-rules", "--strict-config",
